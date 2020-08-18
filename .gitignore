@@ -1,0 +1,9 @@
+build/
+out/
+
+# temp
+single-header/
+
+# ides
+.vscode/
+.vs/
