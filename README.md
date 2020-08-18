@@ -1,0 +1,2 @@
+# confy
+A configuration library
