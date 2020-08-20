@@ -5,6 +5,9 @@
 using namespace std;
 
 int main() {
-    cout << "hello " << confy::foo() << "\n";
+    confy::config config;
+
+    confy::section sec;
+
     return 0;
 }
