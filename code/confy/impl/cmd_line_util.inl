@@ -7,7 +7,6 @@ namespace
 
 struct parsed_argument
 {
-    bool arg = false; // is it an argument (or a value)
     bool relevant = false; // is it relevant to confy
     bool abbr = false; // is it an abbreviated argument
     std::string_view name;
@@ -25,7 +24,6 @@ parsed_argument parse_single_arg(std::string_view arg, std::string_view prefix =
     if (arg[0] != '-') return {};
 
     parsed_argument ret;
-    ret.arg = true;
 
     arg = arg.substr(1);
     if (arg.empty()) return ret;

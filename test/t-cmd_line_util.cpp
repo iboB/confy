@@ -1,75 +1,65 @@
 #include "doctest.hpp"
-#include "cmd_line_util.inl"
+#include "impl/cmd_line_util.inl"
 
 #include <vector>
 
 TEST_CASE("parse_single_arg")
 {
     auto p = parse_single_arg("");
-    CHECK_FALSE(p.arg);
     CHECK_FALSE(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("/yyy");
-    CHECK_FALSE(p.arg);
     CHECK_FALSE(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("--port");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name == "port");
     CHECK(p.value.empty());
 
     p = parse_single_arg("-p");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK(p.abbr);
     CHECK(p.name == "p");
     CHECK(p.value.empty());
 
     p = parse_single_arg("--zoom=43");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name == "zoom");
     CHECK(p.value == "43");
 
     p = parse_single_arg("-a.b.z=true");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK(p.abbr);
     CHECK(p.name == "a.b.z");
     CHECK(p.value == "true");
 
     p = parse_single_arg("--my:port", "my:");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name == "port");
     CHECK(p.value.empty());
 
     p = parse_single_arg("-p", "my:");
-    CHECK(p.arg);
     CHECK_FALSE(p.relevant);
     CHECK(p.abbr);
     CHECK(p.name.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("--my:zoom=43", "my:");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
     CHECK(p.name == "zoom");
     CHECK(p.value == "43");
 
     p = parse_single_arg("-my:a.b.z=true", "my:");
-    CHECK(p.arg);
     CHECK(p.relevant);
     CHECK(p.abbr);
     CHECK(p.name == "a.b.z");
