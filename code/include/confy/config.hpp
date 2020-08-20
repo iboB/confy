@@ -14,11 +14,16 @@ namespace confy
 
 class option;
 
-class section : public impl::has_key
+class CONFY_API section : public impl::has_key
 {
 public:
     section();
     ~section();
+
+    section(const section&) = delete;
+    section& operator=(const section&) = delete;
+    section(section&&) noexcept = delete;
+    section& operator=(section&&) noexcept = delete;
 
 private:
     std::vector<std::unique_ptr<option>> m_options;
@@ -29,6 +34,9 @@ class CONFY_API config
 public:
     config(std::string_view name = {});
     ~config();
+
+    config(const config&) = delete;
+    config& operator=(const config&) = delete;
 
     // add a section with options
     void add_section(section sec);
