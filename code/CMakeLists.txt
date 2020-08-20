@@ -1,9 +1,8 @@
 set(src
-    include/confy/impl/api.h
+    confy/impl/api.h
 
-    include/confy/confy.hpp
-
-    confy.cpp
+    confy/confy.hpp
+    confy/confy.cpp
 )
 
 if(CONFY_STATIC_LIB)
@@ -24,6 +23,6 @@ target_compile_definitions(confy
     PRIVATE -DCONFY_IMPLEMENT=1
 )
 
-target_include_directories(confy PUBLIC include)
+target_include_directories(confy PUBLIC .)
 
 # option(CONFY_GENERATE_SINGLE_HEADER "Confy-dev: generate single header" ${dev_mode})
