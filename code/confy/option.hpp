@@ -20,6 +20,7 @@ public:
 
     value_source source() const { return m_source; }
 
+    bool try_set_value(value_source src, std::string_view val);
 protected:
     virtual bool set_from_default() = 0;
     virtual bool set_from_string(std::string_view str) = 0;
