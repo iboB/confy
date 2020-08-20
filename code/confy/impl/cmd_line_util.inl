@@ -5,11 +5,28 @@
 namespace
 {
 
+constexpr char SECTION_DELIM = '.';
+
+// split argument into section and name
+struct arg_split
+{
+    std::string_view section;
+    std::string_view option;
+};
+
+arg_split split_name(std::string_view name)
+{
+    auto pos = name.find_last_of(SECTION_DELIM);
+    if (pos == std::string_view::npos) return { {}, name }; // no section
+
+    return { {name.substr(0, pos)}, {name.substr(pos + 1)} };
+}
+
 struct parsed_argument
 {
     bool relevant = false; // is it relevant to confy
     bool abbr = false; // is it an abbreviated argument
-    std::string_view name;
+    arg_split path;
     std::string_view value;
 };
 
@@ -49,11 +66,11 @@ parsed_argument parse_single_arg(std::string_view arg, std::string_view prefix =
     if (pos == std::string_view::npos)
     {
         // no equals
-        ret.name = arg;
+        ret.path = split_name(arg);
     }
     else
     {
-        ret.name = arg.substr(0, pos);
+        ret.path = split_name(arg.substr(0, pos));
         ret.value = arg.substr(pos + 1);
     }
 
@@ -81,13 +98,13 @@ void filter_command_line(int& argc, char* argv[], std::string_view prefix, F&& f
             // so we shall interpret an irrelevant arg as a value
             if (!p.relevant)
             {
-                func(last_p.name, last_p.abbr, arg);
+                func(last_p.path, last_p.abbr, arg);
                 continue;
             }
             else
             {
                 // p is relevant, this means we'll interpret last arg as true
-                func(last_p.name, last_p.abbr, UNSET_VALUE);
+                func(last_p.path, last_p.abbr, UNSET_VALUE);
 
                 // do not `continue`
                 // go on with parsing the relevant arg
@@ -107,13 +124,13 @@ void filter_command_line(int& argc, char* argv[], std::string_view prefix, F&& f
             continue;
         }
 
-        func(p.name, p.abbr, p.value);
+        func(p.path, p.abbr, p.value);
     }
 
     if (wants_value)
     {
         // we haven't completed the last arg
-        func(last_p.name, last_p.abbr, UNSET_VALUE);
+        func(last_p.path, last_p.abbr, UNSET_VALUE);
     }
 
     argc = new_argc;

@@ -3,72 +3,102 @@
 
 #include <vector>
 
+TEST_CASE("arg_split")
+{
+    auto t = split_name("");
+    CHECK(t.section.empty());
+    CHECK(t.option.empty());
+
+    t = split_name("xxx=yyy");
+    CHECK(t.section.empty());
+    CHECK(t.option == "xxx=yyy");
+
+    t = split_name("sec.oo");
+    CHECK(t.section == "sec");
+    CHECK(t.option == "oo");
+
+    t = split_name("animalia.chordata.lion");
+    CHECK(t.section == "animalia.chordata");
+    CHECK(t.option == "lion");
+}
+
 TEST_CASE("parse_single_arg")
 {
     auto p = parse_single_arg("");
     CHECK_FALSE(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name.empty());
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("/yyy");
     CHECK_FALSE(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name.empty());
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("--port");
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name == "port");
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option == "port");
     CHECK(p.value.empty());
 
     p = parse_single_arg("-p");
     CHECK(p.relevant);
     CHECK(p.abbr);
-    CHECK(p.name == "p");
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option == "p");
     CHECK(p.value.empty());
 
     p = parse_single_arg("--zoom=43");
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name == "zoom");
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option == "zoom");
     CHECK(p.value == "43");
 
     p = parse_single_arg("-a.b.z=true");
     CHECK(p.relevant);
     CHECK(p.abbr);
-    CHECK(p.name == "a.b.z");
+    CHECK(p.path.section == "a.b");
+    CHECK(p.path.option == "z");
     CHECK(p.value == "true");
 
     p = parse_single_arg("--my:port", "my:");
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name == "port");
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option == "port");
     CHECK(p.value.empty());
 
     p = parse_single_arg("-p", "my:");
     CHECK_FALSE(p.relevant);
     CHECK(p.abbr);
-    CHECK(p.name.empty());
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option.empty());
     CHECK(p.value.empty());
 
     p = parse_single_arg("--my:zoom=43", "my:");
     CHECK(p.relevant);
     CHECK_FALSE(p.abbr);
-    CHECK(p.name == "zoom");
+    CHECK(p.path.section.empty());
+    CHECK(p.path.option == "zoom");
     CHECK(p.value == "43");
 
     p = parse_single_arg("-my:a.b.z=true", "my:");
     CHECK(p.relevant);
     CHECK(p.abbr);
-    CHECK(p.name == "a.b.z");
+    CHECK(p.path.section == "a.b");
+    CHECK(p.path.option == "z");
     CHECK(p.value == "true");
 }
 
 struct arg
 {
-    std::string name;
+    std::string section;
+    std::string option;
     bool abbr;
     std::string value;
 };
@@ -84,8 +114,8 @@ TEST_CASE("filter_command_line")
     std::string_view prefix;
     auto parse = [&args, &prefix](std::vector<std::string> sargv) {
         args.clear();
-        auto single = [&args](std::string_view name, bool abbr, std::string_view value) {
-            args.emplace_back(arg{ std::string{name}, abbr, std::string{value} });
+        auto single = [&args](arg_split path, bool abbr, std::string_view value) {
+            args.emplace_back(arg{ std::string{path.section}, std::string{path.option}, abbr, std::string{value} });
         };
         std::vector<char*> argv;
         char exe[] = "exe";
@@ -117,7 +147,8 @@ TEST_CASE("filter_command_line")
     CHECK(args.size() == 1);
     CHECK(cmp(f, { "exe" }));
     auto a = args.begin();
-    CHECK(a->name == "allow");
+    CHECK(a->section.empty());
+    CHECK(a->option == "allow");
     CHECK_FALSE(a->abbr);
     CHECK(a->value == UNSET_VALUE);
 
@@ -126,22 +157,26 @@ TEST_CASE("filter_command_line")
     CHECK(cmp(f, { "exe", "x", "y", "zz" }));
 
     a = args.begin();
-    CHECK(a->name == "allow");
+    CHECK(a->section.empty());
+    CHECK(a->option == "allow");
     CHECK_FALSE(a->abbr);
     CHECK(a->value == "false");
 
     ++a;
-    CHECK(a->name == "chordata.lion");
+    CHECK(a->section == "chordata");
+    CHECK(a->option == "lion");
     CHECK_FALSE(a->abbr);
     CHECK(a->value == "pepe");
 
     ++a;
-    CHECK(a->name == "b");
+    CHECK(a->section.empty());
+    CHECK(a->option == "b");
     CHECK(a->abbr);
     CHECK(a->value == "0");
 
     ++a;
-    CHECK(a->name == "chordata.l");
+    CHECK(a->section == "chordata");
+    CHECK(a->option == "l");
     CHECK(a->abbr);
     CHECK(a->value == "pipi");
 
@@ -151,22 +186,26 @@ TEST_CASE("filter_command_line")
     CHECK(cmp(f, { "exe", "-x", "--y", "-zz=34", "--yours:gg=45" }));
 
     a = args.begin();
-    CHECK(a->name == "allow");
+    CHECK(a->section.empty());
+    CHECK(a->option == "allow");
     CHECK_FALSE(a->abbr);
     CHECK(a->value == "false");
 
     ++a;
-    CHECK(a->name == "chordata.lion");
+    CHECK(a->section == "chordata");
+    CHECK(a->option == "lion");
     CHECK_FALSE(a->abbr);
     CHECK(a->value == "pepe");
 
     ++a;
-    CHECK(a->name == "b");
+    CHECK(a->section.empty());
+    CHECK(a->option == "b");
     CHECK(a->abbr);
     CHECK(a->value == "0");
 
     ++a;
-    CHECK(a->name == "chordata.l");
+    CHECK(a->section == "chordata");
+    CHECK(a->option == "l");
     CHECK(a->abbr);
     CHECK(a->value == "pipi");
 }
