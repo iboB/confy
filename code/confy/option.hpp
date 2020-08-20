@@ -2,21 +2,20 @@
 
 #include "impl/api.h"
 
-#include "impl/has_key.hpp"
+#include "impl/config_item.hpp"
 
-#include "generic_value.hpp"
+#include "value_source.hpp"
 
 #include <string>
 
 namespace confy
 {
 
-class CONFY_API option : public impl::has_key
+class CONFY_API option : public impl::config_item
 {
 public:
     virtual ~option();
 
-    const std::string& description() const { return m_description; }
     const std::string& env_var() const { return m_env_var; }
 
     value_source source() const { return m_source; }

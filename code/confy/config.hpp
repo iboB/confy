@@ -1,7 +1,7 @@
 #pragma once
 
 #include "impl/api.h"
-#include "impl/has_key.hpp"
+#include "impl/config_item.hpp"
 
 #include <string>
 #include <string_view>
@@ -14,7 +14,7 @@ namespace confy
 
 class option;
 
-class CONFY_API section : public impl::has_key
+class CONFY_API section : public impl::config_item
 {
 public:
     section();

@@ -8,11 +8,12 @@ namespace confy
 {
 namespace impl
 {
-class CONFY_API has_key
+class CONFY_API config_item
 {
 public:
     const std::string& name() const { return m_name; }
     const std::string& abbr() const { return m_abbr; }
+    const std::string& description() const { return m_description; }
 
     // template <typename
     // class dsl
@@ -25,6 +26,7 @@ public:
 protected:
     std::string m_name;
     std::string m_abbr;
+    std::string m_description;
 };
 }
 }

@@ -1,5 +1,12 @@
 set(src
     confy/impl/api.h
+    confy/impl/config_item.hpp
+
+    confy/config.hpp
+    confy/config.cpp
+    confy/config_builder.hpp
+    confy/value_source.hpp
+    confy/option.hpp
 
     confy/confy.hpp
     confy/confy.cpp
