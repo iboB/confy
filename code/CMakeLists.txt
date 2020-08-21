@@ -12,7 +12,6 @@ set(src
     confy/value_source.hpp
 
     confy/confy.hpp
-    confy/confy.cpp
 )
 
 if(CONFY_STATIC_LIB)
