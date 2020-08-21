@@ -8,25 +8,25 @@ namespace
 constexpr char SECTION_DELIM = '.';
 
 // split argument into section and name
-struct arg_split
+struct path_split
 {
     std::string_view section;
     std::string_view option;
 };
 
-arg_split split_name(std::string_view name)
+path_split split_option_path(std::string_view path)
 {
-    auto pos = name.find_last_of(SECTION_DELIM);
-    if (pos == std::string_view::npos) return { {}, name }; // no section
+    auto pos = path.find_last_of(SECTION_DELIM);
+    if (pos == std::string_view::npos) return { {}, path }; // no section
 
-    return { {name.substr(0, pos)}, {name.substr(pos + 1)} };
+    return { {path.substr(0, pos)}, {path.substr(pos + 1)} };
 }
 
 struct parsed_argument
 {
     bool relevant = false; // is it relevant to confy
     bool abbr = false; // is it an abbreviated argument
-    arg_split path;
+    std::string_view path;
     std::string_view value;
 };
 
@@ -66,11 +66,11 @@ parsed_argument parse_single_arg(std::string_view arg, std::string_view prefix =
     if (pos == std::string_view::npos)
     {
         // no equals
-        ret.path = split_name(arg);
+        ret.path = arg;
     }
     else
     {
-        ret.path = split_name(arg.substr(0, pos));
+        ret.path = arg.substr(0, pos);
         ret.value = arg.substr(pos + 1);
     }
 
