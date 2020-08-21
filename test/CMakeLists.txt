@@ -7,3 +7,8 @@ add_executable(test-cmd_line_util t-cmd_line_util.cpp)
 target_include_directories(test-cmd_line_util PRIVATE  ../code/confy)
 target_link_libraries(test-cmd_line_util doctest)
 add_test(NAME cmd_line_util COMMAND $<TARGET_FILE:test-cmd_line_util>)
+
+add_executable(test-laurel t-laurel.cpp)
+target_include_directories(test-laurel PRIVATE  ../code/confy)
+target_link_libraries(test-laurel doctest)
+add_test(NAME laurel COMMAND $<TARGET_FILE:test-laurel>)
