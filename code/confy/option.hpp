@@ -11,6 +11,8 @@
 namespace confy
 {
 
+class config;
+
 class CONFY_API option : public impl::config_item
 {
 public:
@@ -20,8 +22,8 @@ public:
 
     value_source source() const { return m_source; }
 
-    bool try_set_value(value_source src, std::string_view val);
 protected:
+    friend class config;
     virtual bool set_from_default() = 0;
     virtual bool set_from_string(std::string_view str) = 0;
 
