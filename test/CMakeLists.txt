@@ -3,12 +3,24 @@ add_library(doctest STATIC
     doctest_main.cpp
 )
 
-add_executable(test-cmd_line_util t-cmd_line_util.cpp)
-target_include_directories(test-cmd_line_util PRIVATE  ../code/confy)
-target_link_libraries(test-cmd_line_util doctest)
-add_test(NAME cmd_line_util COMMAND $<TARGET_FILE:test-cmd_line_util>)
+macro(add_lib_test test lib)
+    set(tname test-${lib}-${test})
+    add_executable(${tname} ${ARGN})
+    target_link_libraries(${tname} doctest ${lib})
+    set_target_properties(${tname} PROPERTIES FOLDER test)
+    add_test(NAME ${test} COMMAND $<TARGET_FILE:${tname}>)
+endmacro()
 
-add_executable(test-laurel t-laurel.cpp)
-target_include_directories(test-laurel PRIVATE  ../code/confy)
-target_link_libraries(test-laurel doctest)
-add_test(NAME laurel COMMAND $<TARGET_FILE:test-laurel>)
+add_library(confy-impl INTERFACE)
+target_include_directories(confy-impl INTERFACE ../code/confy)
+
+macro(add_impl_test test)
+    add_lib_test(${test} confy-impl ${ARGN})
+endmacro()
+
+add_impl_test(cmd_line_util t-cmd_line_util.cpp)
+add_impl_test(laurel t-laurel.cpp)
+
+macro(add_confu_test test)
+    add_lib_test(${test} confy ${ARGN})
+endmacro()
