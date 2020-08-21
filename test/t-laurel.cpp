@@ -18,7 +18,7 @@ struct tester_entry
 
     tester_entry(std::string_view sname) : type(sec), str(sname) {}
     tester_entry(std::string_view kname, std::string_view kval) : type(key), str(kname), key_value(kval) {}
-    tester_entry(std::string_view etext, int eline) : type(err), str(etext), err_line(eline) {}
+    tester_entry(laurel_error error , int eline) : type(err), str(laurel_error_to_text(error)), err_line(eline) {}
 };
 
 struct tester
@@ -49,11 +49,11 @@ struct tester
         CHECK(e.key_value == kval);
     }
 
-    void operator()(std::string_view etext, int eline) const
+    void operator()(laurel_error error, int eline) const
     {
         auto& e = next();
         CHECK(e.type == tester_entry::err);
-        CHECK(e.str == etext);
+        CHECK(e.str == laurel_error_to_text(error));
         CHECK(e.err_line == eline);
     }
 
@@ -80,7 +80,7 @@ sp ace=va lue
 TEST_CASE("test error =")
 {
     const char* ini = "val2asd";
-    tester t({ {"key missing `=`", 1} });
+    tester t({ {laurel_error::missing_eq, 1} });
     std::istringstream sini(ini);
     laurel(sini, t, t, t);
 }
@@ -88,7 +88,7 @@ TEST_CASE("test error =")
 TEST_CASE("test error ]")
 {
     const char* ini = "a=5  \n;comment\n[ss";
-    tester t({ {"a", "5"}, {"section missing closing `]`", 3} });
+    tester t({ {"a", "5"}, {laurel_error::missing_cb, 3} });
     std::istringstream sini(ini);
     laurel(sini, t, t, t);
 }

@@ -24,7 +24,7 @@
 //    called for each new section
 // key_func = a functor compatible with void(string_view k, string_view v)
 //    called for each new key and its value
-// error_func = a functor compatible with void(const char* text, int line)
+// error_func = a functor compatible with void(laurel_error error, int line)
 //    called for errors and gives the line along with the text
 
 #include <string_view>
@@ -33,6 +33,21 @@
 
 namespace
 {
+
+enum class laurel_error
+{
+    missing_cb, // section missing closing bracket [
+    missing_eq  // key missing equality sign =
+};
+
+const char* laurel_error_to_text(laurel_error error)
+{
+    switch (error) {
+    case laurel_error::missing_cb: return "section missing closing `]`";
+    case laurel_error::missing_eq: return "key missing `=`";
+    default: return "";
+    }
+}
 
 template <typename OnSec, typename OnKey, typename OnError>
 void laurel(std::istream& in, OnSec&& on_section, OnKey&& on_key, OnError&& on_error)
@@ -77,14 +92,14 @@ void laurel(std::istream& in, OnSec&& on_section, OnKey&& on_key, OnError&& on_e
         if (line.front() == '[')
         {
             auto close = line.find(']');
-            if (close == std::string_view::npos) return on_error("section missing closing `]`", line_num);
+            if (close == std::string_view::npos) return on_error(laurel_error::missing_cb, line_num);
             on_section(line.substr(1, close - 1));
             continue;
         }
 
         // value
         auto eq = line.find('=');
-        if (eq == std::string_view::npos) return on_error("key missing `=`", line_num);
+        if (eq == std::string_view::npos) return on_error(laurel_error::missing_eq, line_num);
 
         on_key(line.substr(0, eq), line.substr(eq + 1));
     }
