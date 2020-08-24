@@ -110,7 +110,7 @@ public:
 
     // writes the schema in human readable format
     // it can be used for help for command line tools
-    void write_schema(std::ostream& out);
+    void write_schema(std::ostream& out, bool basic = false);
 
 private:
     std::string m_name; // name of config (for logging purposes)

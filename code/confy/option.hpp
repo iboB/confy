@@ -30,11 +30,12 @@ public:
 
     enum class set_value_result
     {
-        success,
+        success, // value was set
         skipped, // setting a value from a smaller source (lower prio). soft success
-        same_source_value, // setting a value from the same source
-        bad_value, // value was incompatible
-        bad_default, // default was missing or incompatible
+        same_source_value, // a value was provided from the same source
+        bad_value, // the provided value was not compatible with the type
+        bad_default, // default was requested but the option has a missing or incompatible default
+        bad_source, // the provided source is not allowed for this value (not returned by default try_set_value implementation)
     };
 
     // the default implementation will try to set the value from the given source
@@ -46,7 +47,7 @@ public:
 
     // you can override this with `return true` on boolean option with false defaults
     // this will provide a prettier schema output
-    virtual bool true_only() const { return false; }
+    virtual bool is_command() const { return false; }
 
     // print the value type
     virtual void write_value_type(std::ostream& out) const = 0;
@@ -55,15 +56,16 @@ public:
     virtual void write_value_type_desc(std::ostream& out) const = 0;
 
     // you can override this for options with no default value
-    virtual bool has_default_val() const = 0;
+    virtual bool has_default_value() const = 0;
 
     // write the default value
-    virtual void write_default_val(std::ostream& out) const = 0;
+    virtual void write_default_value(std::ostream& out) const = 0;
 
 protected:
     friend class config;
     friend class section;
 
+    // return true on success, false otherwise
     virtual bool set_from_default() = 0;
     virtual bool set_from_string(std::string_view str) = 0;
 

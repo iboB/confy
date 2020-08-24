@@ -134,7 +134,7 @@ public:
         case option::set_value_result::bad_default:
             e.type = config_error::bad_default;
             sout << "The requested default value ";
-            opt.write_default_val(sout);
+            opt.write_default_value(sout);
             sout << " was incompatible with the expected format: ";
             opt.write_value_type_desc(sout);
             break;
@@ -422,7 +422,7 @@ void config::update_options()
     }
 }
 
-void config::write_schema(std::ostream& out)
+void config::write_schema(std::ostream& out, bool basic)
 {
     if (m_name.empty()) out << "confy";
     else out << m_name;
@@ -431,14 +431,23 @@ void config::write_schema(std::ostream& out)
 
     for (const auto& sec : m_sections)
     {
-        out << sec.name() << ":\n\n";
+        out << sec.name() << '\n';
+
+        if (!basic)
+        {
+            if (!sec.description().empty() && !basic)
+            {
+                out << sec.description() << '\n';
+            }
+            out << '\n';
+        }
 
         for (const auto& popt : sec.m_options)
         {
             auto& opt = *popt;
             out << "--";
             output_path(out, opt);
-            if (!opt.true_only())
+            if (!opt.is_command())
             {
                 out << "=<";
                 opt.write_value_type(out);
@@ -450,7 +459,7 @@ void config::write_schema(std::ostream& out)
                 out << ", -";
                 if (!sec.abbr().empty()) out << sec.abbr() << SECTION_DELIM;
                 out << opt.abbr();
-                if (!opt.true_only())
+                if (!opt.is_command())
                 {
                     out << "=<";
                     opt.write_value_type(out);
@@ -458,27 +467,50 @@ void config::write_schema(std::ostream& out)
                 }
             }
 
-            out << '\n';
-            if (!opt.description().empty())
+            if (basic)
             {
-                out << "    " << opt.description() << '\n';
-            }
-
-            if (!opt.no_env())
-            {
-                out << "    Environment variable: " << opt.env_var() << '\n';
-            }
-
-            if (opt.has_default_val())
-            {
-                out << "    Default is: ";
-                opt.write_default_val(out);
+                if (!opt.no_env())
+                {
+                    out << ", " << opt.env_var();
+                }
+                if (opt.has_default_value())
+                {
+                    out << ", d: ";
+                    opt.write_default_value(out);
+                }
+                else
+                {
+                    out << "Required!";
+                }
+                out << '\n';
             }
             else
             {
-                out << "    Required!";
+                out << "\n    ";
+                opt.write_value_type_desc(out);
+                out << '\n';
+
+                if (!opt.description().empty())
+                {
+                    out << "    " << opt.description() << '\n';
+                }
+
+                if (!opt.no_env())
+                {
+                    out << "    Environment variable: " << opt.env_var() << '\n';
+                }
+
+                if (opt.has_default_value())
+                {
+                    out << "    Default is: ";
+                    opt.write_default_value(out);
+                }
+                else
+                {
+                    out << "    Required!";
+                }
+                out << "\n\n";
             }
-            out << "\n\n";
         }
     }
 }

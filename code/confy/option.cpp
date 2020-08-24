@@ -34,7 +34,7 @@ option::set_value_result option::try_set_value(std::string_view val, value_sourc
         return set_value_result::success;
     }
 
-    return set_value_result::bad_default;
+    return set_value_result::bad_value;
 }
 
 }
