@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <confy/confy.hpp>
+#include <confy/types/generic_option.hpp>
 
 using namespace std;
 
