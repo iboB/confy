@@ -21,10 +21,10 @@ public:
     struct dsl_t : public option::dsl_t<Option>
     {
         using option::dsl_t<Option>::dsl_t;
-        dsl& val(T& v)
+        auto& val(T& v)
         {
-            m_option.set_value_ptr(&v);
-            return self();
+            this->m_option.set_value_ptr(&v);
+            return this->self();
         }
     };
     using dsl = dsl_t<generic_option<T>>;
@@ -71,7 +71,7 @@ protected:
     virtual bool set_from_string(std::string_view str) final
     {
         T val;
-        if (!from_string(val, str)) return false;
+        if (!::confy::from_string(val, str)) return false;
         if (!validate(val)) return false;
         if (!m_value_ptr) return true;
         *m_value_ptr = std::move(val);

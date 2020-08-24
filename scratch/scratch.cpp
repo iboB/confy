@@ -5,10 +5,13 @@
 
 using namespace std;
 
+namespace confy
+{
 bool from_string(std::string& out, std::string_view in)
 {
     out = in;
     return true;
+}
 }
 
 class str : public confy::generic_option<std::string>

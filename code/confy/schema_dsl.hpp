@@ -25,7 +25,7 @@ public:
     {
         add_cur_option();
         m_cur_option = std::make_unique<Option>(name, abbr, desc);
-        return Option::dsl(static_cast<Option&>(*m_cur_option), *this);
+        return typename Option::dsl(static_cast<Option&>(*m_cur_option), *this);
     }
 
 private:
