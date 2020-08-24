@@ -27,7 +27,7 @@ public:
     {
         success,
         skipped, // setting a value from a smaller source (lower prio). soft success
-        same_source, // setting a value from the same source
+        same_source_value, // setting a value from the same source
         bad_value, // value was incompatible
         bad_default, // default was missing or incompatible
     };

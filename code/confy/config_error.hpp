@@ -17,9 +17,9 @@ public:
         bad_source, // the source of the value was malformed
         no_such_section, // configuration referred to a section which was not defined in schema
         no_such_option, // configuration tried to set value to an option that was not defined in schema
-        bad_default_value, // default value of option was missing or incompatible
+        same_source_value, // value was provided multiple times from the same source
         bad_value, // provided value of option was incompatible
-        multiple_value, // value was provided multiple times from the same source
+        bad_default, // default value of option was missing or incompatible
     };
     type_ type;
 

@@ -117,8 +117,8 @@ public:
         sout << "error setting value \"" << value << "\" to option " << opt << ". ";
         switch (result)
         {
-        case option::set_value_result::same_source:
-            e.type = config_error::multiple_value;
+        case option::set_value_result::same_source_value:
+            e.type = config_error::same_source_value;
             sout << "A different value was set with the same source priority.";
             break;
         case option::set_value_result::bad_value:
@@ -126,7 +126,7 @@ public:
             sout << "The expected value format is ";
             break;
         case option::set_value_result::bad_default:
-            e.type = config_error::bad_default_value;
+            e.type = config_error::bad_default;
             sout << "The requested default value ";
             sout << " was incompatible with the expected format: ";
         }
@@ -142,7 +142,7 @@ public:
         auto& e = make_error();
         e.source = value_source::default_val;
         e.source_name = "fallback to default value";
-        e.type = config_error::bad_default_value;
+        e.type = config_error::bad_default;
         e.section_name = opt.m_section->name();
         e.option_name = opt.name();
         e.opt = &opt;
