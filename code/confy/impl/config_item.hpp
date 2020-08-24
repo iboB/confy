@@ -19,8 +19,11 @@ public:
     {}
 
     const std::string& name() const { return m_name; }
+    void set_name(std::string_view n) { m_name = n; }
     const std::string& abbr() const { return m_abbr; }
+    void set_abbr(std::string_view n) { m_abbr = n; }
     const std::string& description() const { return m_description; }
+    void set_description(std::string_view n) { m_description = n; }
 
     // template <typename
     // class dsl

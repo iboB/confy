@@ -9,6 +9,8 @@ template <typename T>
 class generic_option : public option
 {
 public:
+    using option::option;
+
     virtual void write_value_type(std::ostream& out) const final
     {
         out << m_value_type;

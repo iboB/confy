@@ -51,8 +51,29 @@ public:
 
     ///////////////////////////////////////////////////////////////////////////
     // setup
-
+    const std::string& name() const { return m_name; }
+    const std::string& env_var_prefix() const { return m_env_var_prefix; }
+    void set_env_var_prefix(std::string_view p) { m_env_var_prefix = p; }
+    const std::string& cmd_prefix() const { return m_cmd_prefix; }
+    void set_cmd_prefix(std::string_view p) { m_cmd_prefix = p; }
+    std::ostream* verbose_stream() const { return m_verbose_stream; }
+    void set_verbose_stream(std::ostream* s) { m_verbose_stream = s; }
     bool no_env() const { return m_no_env; }
+    void set_no_env(bool s = true) { m_no_env = s; }
+
+    struct setup_dsl
+    {
+        setup_dsl(config& cfg) : cfg(cfg) {}
+        config& cfg;
+
+        setup_dsl& env_var_prefix(std::string_view p) { cfg.set_env_var_prefix(p); return *this; }
+        setup_dsl& cmd_prefix(std::string_view p) { cfg.set_cmd_prefix(p); return *this; }
+        setup_dsl& verbose_stream(std::ostream* p) { cfg.set_verbose_stream(p); return *this; }
+        setup_dsl& verbose_stream(std::ostream& p) { cfg.set_verbose_stream(&p); return *this; }
+        setup_dsl& no_env(bool s = true) { cfg.set_no_env(s); return *this; }
+    };
+
+    setup_dsl setup() { return setup_dsl(*this); }
 
     ///////////////////////////////////////////////////////////////////////////
     // schema building

@@ -445,7 +445,7 @@ void config::write_schema(std::ostream& out, bool basic)
         for (const auto& popt : sec.m_options)
         {
             auto& opt = *popt;
-            out << "--";
+            out << "--" << m_cmd_prefix;
             output_path(out, opt);
             if (!opt.is_command())
             {
@@ -456,7 +456,7 @@ void config::write_schema(std::ostream& out, bool basic)
 
             if (!opt.abbr().empty())
             {
-                out << ", -";
+                out << ", -" << m_cmd_prefix;
                 if (!sec.abbr().empty()) out << sec.abbr() << SECTION_DELIM;
                 out << opt.abbr();
                 if (!opt.is_command())

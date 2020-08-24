@@ -18,6 +18,7 @@ class section;
 class CONFY_API option : public impl::config_item
 {
 public:
+    using config_item::config_item;
     virtual ~option();
 
     const std::string& env_var() const { return m_env_var; }
