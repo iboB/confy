@@ -30,16 +30,7 @@ inline std::ostream& operator<<(std::ostream& o, const option& opt)
     return o;
 }
 
-namespace
-{
-struct ostr : public std::ostringstream
-{
-    operator std::string() const {
-        return str();
-    }
-};
-}
-
+using ostr = std::ostringstream;
 
 class config::config_error_manager
 {
@@ -83,7 +74,9 @@ public:
         e.type = config_error::no_such_section;
         e.section_name = name;
 
-        e.error_text = ostr() << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " section `" << name << "`. No option values will be set from it";
+        ostr out;
+        out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " section `" << name << "`. No option values will be set from it";
+        e.error_text = out.str();
     }
 
     void no_option(std::string_view sec, std::string_view opt, bool is_abbr)
@@ -93,7 +86,9 @@ public:
         e.section_name = sec;
         e.option_name = opt;
 
-        e.error_text = ostr() << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " option `" << sec << SECTION_DELIM << opt << "`.";
+        ostr out;
+        out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " option `" << sec << SECTION_DELIM << opt << "`.";
+        e.error_text = out.str();
     }
 
     void source_error(std::string_view error)
@@ -101,7 +96,9 @@ public:
         auto& e = make_error();
         e.type = config_error::bad_source;
 
-        e.error_text = ostr() << "error in " << e.source_name << ": " << error;
+        ostr out;
+        out << "error in " << e.source_name << ": " << error;
+        e.error_text = out.str();
     }
 
     void bad_set_value(const option& opt, std::string_view value, value_source source, option::set_value_result result)
@@ -150,7 +147,9 @@ public:
         e.option_name = opt.name();
         e.opt = &opt;
 
-        e.error_text = ostr() << "VALUE SET FAILED on " << opt;
+        ostr out;
+        out << "VALUE SET FAILED on " << opt;
+        e.error_text = out.str();
     }
 };
 
