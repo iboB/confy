@@ -131,6 +131,7 @@ public:
             opt.write_default_val(sout);
             sout << " was incompatible with the expected format: ";
             opt.write_value_desc(sout);
+            break;
         default:
             assert(false);
         }
