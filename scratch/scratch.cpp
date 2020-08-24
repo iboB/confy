@@ -36,6 +36,13 @@ int main() {
 
         cfg.add_section(std::move(sec));
 
+        confy::section sec2("zoo");
+
+        sec2.add_option(std::make_unique<str>("asd", "a", "the asd"));
+        sec2.add_option(std::make_unique<str>("bbbasd", "b", "the basda asd"));
+
+        cfg.add_section(std::move(sec2));
+
         cfg.write_schema(cout);
     }
     catch (std::exception& e)

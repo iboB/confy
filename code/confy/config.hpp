@@ -131,7 +131,7 @@ public:
 
     // writes the schema in human readable format
     // it can be used for help for command line tools
-    void write_schema(std::ostream& out, bool basic = false);
+    void write_schema(std::ostream& out, bool basic = false) const;
 
 private:
     std::string m_name; // name of config (for logging purposes)
@@ -140,7 +140,7 @@ private:
     std::ostream* m_verbose_stream = nullptr; // optional verbose output stream
     bool m_no_env = false; // disable enviroment variables
 
-    std::vector<section> m_sections;
+    std::vector<std::unique_ptr<section>> m_sections;
 
     // manage source stack
     void push_source(pushed_source source);

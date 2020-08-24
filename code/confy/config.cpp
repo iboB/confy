@@ -257,22 +257,31 @@ struct throw_t {} _throw;
 
 }
 
-void config::add_section(section sec)
+void config::add_section(section new_sec)
 {
     // so as to allow abbreviated options without specifying abbreviated section names
-    if (sec.abbr().empty()) sec.m_abbr = sec.m_name;
+    if (new_sec.abbr().empty()) new_sec.m_abbr = new_sec.m_name;
 
-    auto f = find(m_sections, by::any(sec));
+    auto f = find(m_sections, by::any(new_sec));
     if (f != m_sections.end())
     {
-        throw_duplicate_section(sec);
+        throw_duplicate_section(new_sec);
     }
-    sec.m_config = this;
+
+    new_sec.m_config = this;
+
+    // add section
+    auto& psec = m_sections.emplace_back(std::make_unique<section>(std::move(new_sec)));
+
+    for (auto& popt : psec->m_options)
+    {
+        popt->m_section = psec.get();
+    }
 
     // generate environment variable names
     if (!m_no_env)
     {
-        for (auto& popt : sec.m_options)
+        for (auto& popt : psec->m_options)
         {
             auto& opt = *popt;
             if (!opt.no_env() && opt.env_var().empty())
@@ -294,9 +303,6 @@ void config::add_section(section sec)
             }
         }
     }
-
-    // add section
-    m_sections.emplace_back(std::move(sec));
 }
 
 void config::parse_ini_file(std::istream& in, std::string_view filename)
@@ -339,7 +345,7 @@ section* config::parser_get_section(std::string_view name, bool is_abbr /*= fals
         m_config_errors->no_section(name, is_abbr);
         return nullptr;
     }
-    return &*sec;
+    return sec->get();
 }
 
 void config::parser_set_option_value(section& sec, std::string_view name, std::string_view value, bool is_abbr /*= false*/)
@@ -365,7 +371,7 @@ void config::parser_set_option_value(std::string_view path, std::string_view val
         m_config_errors->no_option(split.section, split.option, is_abbr);
         return;
     }
-    parser_set_option_value(*sec, split.option, value, is_abbr);
+    parser_set_option_value(**sec, split.option, value, is_abbr);
 }
 
 void config::parser_add_source_error(std::string_view error)
@@ -398,7 +404,7 @@ void config::update_options()
 {
     for (auto& sec : m_sections)
     {
-        for (auto& opt : sec.m_options)
+        for (auto& opt : sec->m_options)
         {
             if (opt->m_source == value_source::none)
             {
@@ -422,15 +428,16 @@ void config::update_options()
     }
 }
 
-void config::write_schema(std::ostream& out, bool basic)
+void config::write_schema(std::ostream& out, bool basic) const
 {
     if (m_name.empty()) out << "confy";
     else out << m_name;
 
     out << " config";
 
-    for (const auto& sec : m_sections)
+    for (const auto& psec : m_sections)
     {
+        auto& sec = *psec;
         out << sec.name() << '\n';
 
         if (!basic)
@@ -540,7 +547,6 @@ void section::add_option(std::unique_ptr<option> o)
     {
         throw_duplicate_option(*this, *o);
     }
-    o->m_section = this;
     m_options.emplace_back(std::move(o));
 }
 
