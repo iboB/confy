@@ -8,17 +8,22 @@
 
 #include <string>
 #include <iosfwd>
+#include <optional>
 
 namespace confy
 {
 
 class config;
 class section;
+class type;
 
 class CONFY_API option : public impl::config_item
 {
 public:
-    virtual ~option();
+    option(const type& t);
+    ~option();
+
+    const type& t() const { return m_type; }
 
     const std::string& env_var() const { return m_env_var; }
 
@@ -40,38 +45,45 @@ public:
     // the default implementation will try to set the value from the given source
     // if the value is "default", it will try to set the default value
     // if the value set is a success, it will set m_source to the source
-    virtual set_value_result try_set_value(std::string_view val, value_source source);
+    set_value_result try_set_value(std::string_view val, value_source source);
 
     // command line and printing utils
 
     // you can override this with `return true` on boolean option with false defaults
     // this will provide a prettier schema output
-    virtual bool true_only() const { return false; }
+    bool true_only() const { return false; }
 
     // print the value type
-    virtual void write_value_type(std::ostream& out) const = 0;
+    void write_value_type(std::ostream& out) const;
 
     // print the value type description
-    virtual void write_value_type_desc(std::ostream& out) const = 0;
+    void write_value_type_desc(std::ostream& out) const;
 
     // you can override this for options with no default value
-    virtual bool has_default_val() const = 0;
+    bool has_default_val() const;
 
     // write the default value
-    virtual void write_default_val(std::ostream& out) const = 0;
+    void write_default_val(std::ostream& out) const;
 
-protected:
+private:
     friend class config;
     friend class section;
 
-    virtual bool set_from_default() = 0;
-    virtual bool set_from_string(std::string_view str) = 0;
+    bool set_from_default();
+    bool set_from_string(std::string_view str);
+
+    const type& m_type;
+
+    void* m_value_ptr; // points to the associated external value
+    std::optional<void*> m_default_value; // some options may lack a default value
 
     std::string m_description; // free form description
     std::string m_env_var; // associated environment variable name
     bool m_no_env = false; // don't use env var for this option only
 
     value_source m_source = value_source::none; // source from which the value was set
+
+
 
     section* m_section = nullptr;
 };

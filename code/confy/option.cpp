@@ -3,6 +3,10 @@
 namespace confy
 {
 
+option::option(const type& t)
+    : m_type(t)
+{}
+
 option::~option() = default;
 
 namespace
