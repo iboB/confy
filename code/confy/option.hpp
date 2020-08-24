@@ -22,6 +22,8 @@ public:
 
     const std::string& env_var() const { return m_env_var; }
 
+    bool no_env() const { return m_no_env; }
+
     value_source source() const { return m_source; }
 
     section* sec() const { return m_section; }
@@ -64,6 +66,7 @@ protected:
 
     std::string m_description; // free form description
     std::string m_env_var; // associated environment variable name
+    bool m_no_env = false; // don't use env var for this option only
 
     value_source m_source = value_source::none; // source from which the value was set
 

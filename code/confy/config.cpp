@@ -362,7 +362,7 @@ void config::update_options()
             if (opt->m_source == value_source::none)
             {
                 // first look for env_var
-                if (!m_no_env)
+                if (!m_no_env && !opt->no_env())
                 {
 
                 }
@@ -424,7 +424,7 @@ void config::write_schema(std::ostream& out)
                 out << "    " << opt.description() << '\n';
             }
 
-            if (!opt.env_var().empty())
+            if (!opt.no_env())
             {
                 out << "    Environment variable: " << opt.env_var() << '\n';
             }
