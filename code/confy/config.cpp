@@ -124,11 +124,14 @@ public:
         case option::set_value_result::bad_value:
             e.type = config_error::bad_value;
             sout << "The expected value format is ";
+            opt.write_value_desc(sout);
             break;
         case option::set_value_result::bad_default:
             e.type = config_error::bad_default;
             sout << "The requested default value ";
+            opt.write_default_val(sout);
             sout << " was incompatible with the expected format: ";
+            opt.write_value_desc(sout);
         }
 
         e.section_name = opt.m_section->name();
@@ -370,6 +373,68 @@ void config::update_options()
                     m_config_errors->no_value(*opt);
                 }
             }
+        }
+    }
+}
+
+void config::write_schema(std::ostream& out)
+{
+    if (m_name.empty()) out << "confy";
+    else out << m_name;
+
+    out << " config";
+
+    for (const auto& sec : m_sections)
+    {
+        out << sec.name() << ":\n\n";
+
+        for (const auto& popt : sec.m_options)
+        {
+            auto& opt = *popt;
+            out << "--";
+            if (!sec.name().empty()) out << sec.name() << SECTION_DELIM;
+            out << opt.name();
+            if (!opt.true_only())
+            {
+                out << "=<";
+                opt.write_value_desc(out);
+                out << '>';
+            }
+
+            if (!opt.abbr().empty())
+            {
+                out << ", -";
+                if (!sec.abbr().empty()) out << sec.abbr() << SECTION_DELIM;
+                out << opt.abbr();
+                if (!opt.true_only())
+                {
+                    out << "=<";
+                    opt.write_value_desc(out);
+                    out << '>';
+                }
+            }
+
+            out << '\n';
+            if (!opt.description().empty())
+            {
+                out << "    " << opt.description() << '\n';
+            }
+
+            if (!opt.env_var().empty())
+            {
+                out << "    Environment variable: " << opt.env_var() << '\n';
+            }
+
+            if (opt.has_default_val())
+            {
+                out << "    Default is: ";
+                opt.write_default_val(out);
+            }
+            else
+            {
+                out << "    Required!";
+            }
+            out << "\n\n";
         }
     }
 }

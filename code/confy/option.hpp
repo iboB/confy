@@ -7,6 +7,7 @@
 #include "value_source.hpp"
 
 #include <string>
+#include <iosfwd>
 
 namespace confy
 {
@@ -23,6 +24,8 @@ public:
 
     value_source source() const { return m_source; }
 
+    section* sec() const { return m_section; }
+
     enum class set_value_result
     {
         success,
@@ -37,7 +40,20 @@ public:
     // if the value set is a success, it will set m_source to the source
     virtual set_value_result try_set_value(std::string_view val, value_source source);
 
-    section* sec() const { return m_section; }
+    // command line and printing utils
+
+    // you can override this with `return true` on boolean option with false defaults
+    // this will provide a prettier schema output
+    virtual bool true_only() const { return false; }
+
+    // print the value description
+    virtual void write_value_desc(std::ostream& out) const = 0;
+
+    // you can override this for options with no default value
+    virtual bool has_default_val() const { return true; }
+
+    // write the default value
+    virtual void write_default_val(std::ostream& out) const = 0;
 
 protected:
     friend class config;
