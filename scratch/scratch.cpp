@@ -4,15 +4,15 @@
 
 using namespace std;
 
-class str : public confy::option
-{
-
-};
-
 int main() {
-    confy::config config;
 
-    confy::section sec;
+    try
+    {
+    }
+    catch (std::exception& e)
+    {
+        cout << e.what() << endl;
+    }
 
     return 0;
 }

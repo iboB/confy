@@ -14,6 +14,15 @@
 namespace confy
 {
 
+inline void output_path(std::ostream& o, const option& opt)
+{
+    if (!opt.sec()->name().empty())
+    {
+        o << opt.sec()->name() << SECTION_DELIM;
+    }
+    o << opt.name();
+}
+
 inline std::ostream& operator<<(std::ostream& o, const section& s)
 {
     if (s.name().empty()) o << "config";
@@ -24,11 +33,8 @@ inline std::ostream& operator<<(std::ostream& o, const section& s)
 inline std::ostream& operator<<(std::ostream& o, const option& opt)
 {
     o << '`';
-    if (!opt.sec()->name().empty())
-    {
-        o << opt.sec()->name() << SECTION_DELIM;
-    }
-    o << opt.name() << '`';
+    output_path(o, opt);
+    o << '`';
     return o;
 }
 
@@ -244,16 +250,52 @@ struct throw_t {} _throw;
     ostr() << "section with name `" << s.name() << "` or abbreviation `" << s.abbr() << "` already exists in config" << _throw;
 }
 
+[[noreturn]] void throw_bad_option_name(const option& o)
+{
+    ostr() << "bad option name `" << o.name() << "`. Option names cannot be empty or contain \"" << SECTION_DELIM << '"' << _throw;
+}
+
 }
 
 void config::add_section(section sec)
 {
+    // so as to allow abbreviated options without specifying abbreviated section names
+    if (sec.abbr().empty()) sec.m_abbr = sec.m_name;
+
     auto f = find(m_sections, by::any(sec));
     if (f != m_sections.end())
     {
         throw_duplicate_section(sec);
     }
     sec.m_config = this;
+
+    // generate environment variable names
+    if (!m_no_env)
+    {
+        for (auto& popt : sec.m_options)
+        {
+            auto& opt = *popt;
+            if (!opt.no_env() && opt.env_var().empty())
+            {
+                std::ostringstream sout;
+                sout << m_env_var_prefix;
+                output_path(sout, opt);
+                opt.m_env_var = sout.str();
+
+                // fix risky characters
+                for (auto& c : opt.m_env_var)
+                {
+                    if (!isalnum(c) && c != '_')
+                    {
+                        c = '_';
+                    }
+                    // should we toupper?
+                }
+            }
+        }
+    }
+
+    // add section
     m_sections.emplace_back(std::move(sec));
 }
 
@@ -395,8 +437,7 @@ void config::write_schema(std::ostream& out)
         {
             auto& opt = *popt;
             out << "--";
-            if (!sec.name().empty()) out << sec.name() << SECTION_DELIM;
-            out << opt.name();
+            output_path(out, opt);
             if (!opt.true_only())
             {
                 out << "=<";
@@ -448,6 +489,14 @@ section& section::operator=(section&&) noexcept = default;
 
 void section::add_option(std::unique_ptr<option> o)
 {
+    if (o->name().empty()) throw_bad_option_name(*o);
+
+    for (auto& c : o->name())
+    {
+        // don't allow section delimeters in option names
+        if (c == SECTION_DELIM) throw_bad_option_name(*o);
+    }
+
     auto f = find(m_options, by::any(*o));
     if (f != m_options.end())
     {
