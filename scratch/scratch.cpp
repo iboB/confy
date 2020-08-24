@@ -4,6 +4,11 @@
 
 using namespace std;
 
+class str : public confy::option
+{
+
+};
+
 int main() {
     confy::config config;
 

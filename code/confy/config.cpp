@@ -123,14 +123,14 @@ public:
         case option::set_value_result::bad_value:
             e.type = config_error::bad_value;
             sout << "The expected value format is ";
-            opt.write_value_desc(sout);
+            opt.write_value_type_desc(sout);
             break;
         case option::set_value_result::bad_default:
             e.type = config_error::bad_default;
             sout << "The requested default value ";
             opt.write_default_val(sout);
             sout << " was incompatible with the expected format: ";
-            opt.write_value_desc(sout);
+            opt.write_value_type_desc(sout);
             break;
         default:
             assert(false);
@@ -163,7 +163,6 @@ config::config(std::string_view name /*= {}*/)
     : m_name(name)
     , m_config_errors(std::make_unique<config_error_manager>())
 {
-    m_sections.emplace_back();
 }
 
 config::~config() = default;
@@ -401,7 +400,7 @@ void config::write_schema(std::ostream& out)
             if (!opt.true_only())
             {
                 out << "=<";
-                opt.write_value_desc(out);
+                opt.write_value_type(out);
                 out << '>';
             }
 
@@ -413,7 +412,7 @@ void config::write_schema(std::ostream& out)
                 if (!opt.true_only())
                 {
                     out << "=<";
-                    opt.write_value_desc(out);
+                    opt.write_value_type(out);
                     out << '>';
                 }
             }

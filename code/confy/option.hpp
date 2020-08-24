@@ -48,11 +48,14 @@ public:
     // this will provide a prettier schema output
     virtual bool true_only() const { return false; }
 
-    // print the value description
-    virtual void write_value_desc(std::ostream& out) const = 0;
+    // print the value type
+    virtual void write_value_type(std::ostream& out) const = 0;
+
+    // print the value type description
+    virtual void write_value_type_desc(std::ostream& out) const = 0;
 
     // you can override this for options with no default value
-    virtual bool has_default_val() const { return true; }
+    virtual bool has_default_val() const = 0;
 
     // write the default value
     virtual void write_default_val(std::ostream& out) const = 0;
