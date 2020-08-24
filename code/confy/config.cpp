@@ -7,7 +7,9 @@
 #include "impl/cmd_line_util.inl"
 #include "impl/laurel.inl"
 
+#include <cassert>
 #include <sstream>
+#include <algorithm>
 
 namespace confy
 {
@@ -129,6 +131,8 @@ public:
             opt.write_default_val(sout);
             sout << " was incompatible with the expected format: ";
             opt.write_value_desc(sout);
+        default:
+            assert(false);
         }
 
         e.section_name = opt.m_section->name();
