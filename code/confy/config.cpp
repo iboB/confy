@@ -473,14 +473,17 @@ void config::write_schema(std::ostream& out, bool basic)
                 {
                     out << ", " << opt.env_var();
                 }
-                if (opt.has_default_value())
+                if (!opt.is_command())
                 {
-                    out << ", d: ";
-                    opt.write_default_value(out);
-                }
-                else
-                {
-                    out << "Required!";
+                    if (opt.has_default_value())
+                    {
+                        out << ", d: ";
+                        opt.write_default_value(out);
+                    }
+                    else
+                    {
+                        out << "Required!";
+                    }
                 }
                 out << '\n';
             }
@@ -500,14 +503,17 @@ void config::write_schema(std::ostream& out, bool basic)
                     out << "    Environment variable: " << opt.env_var() << '\n';
                 }
 
-                if (opt.has_default_value())
+                if (!opt.is_command())
                 {
-                    out << "    Default is: ";
-                    opt.write_default_value(out);
-                }
-                else
-                {
-                    out << "    Required!";
+                    if (opt.has_default_value())
+                    {
+                        out << "    Default is: ";
+                        opt.write_default_value(out);
+                    }
+                    else
+                    {
+                        out << "    Required!";
+                    }
                 }
                 out << "\n\n";
             }
