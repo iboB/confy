@@ -12,8 +12,8 @@ constexpr std::string_view DEFAULT_VALUE = "default";
 
 option::set_value_result option::try_set_value(std::string_view val, value_source source)
 {
-    if (source < m_source) return set_value_result::success;
-    if (source == m_source) return set_value_result::skipped;
+    if (source < m_source) return set_value_result::skipped;
+    if (source == m_source) return set_value_result::same_source_value;
 
     if (val == DEFAULT_VALUE)
     {
