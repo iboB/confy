@@ -5,9 +5,9 @@
 
 using namespace std;
 
-namespace confy
+namespace std
 {
-bool from_string(std::string& out, std::string_view in)
+bool confy_from_string(string& out, string_view in)
 {
     out = in;
     return true;

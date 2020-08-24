@@ -71,7 +71,7 @@ protected:
     virtual bool set_from_string(std::string_view str) final
     {
         T val;
-        if (!::confy::from_string(val, str)) return false;
+        if (!confy_from_string(val, str)) return false;
         if (!validate(val)) return false;
         if (!m_value_ptr) return true;
         *m_value_ptr = std::move(val);
