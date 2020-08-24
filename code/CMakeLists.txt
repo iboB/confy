@@ -4,11 +4,12 @@ set(src
 
     confy/config.hpp
     confy/config.cpp
-    confy/config_builder.hpp
     confy/exception.hpp
     confy/exception.cpp
     confy/option.hpp
     confy/option.cpp
+    confy/schema_dsl.hpp
+    confy/schema_dsl.cpp
     confy/value_source.hpp
 
     confy/confy.hpp

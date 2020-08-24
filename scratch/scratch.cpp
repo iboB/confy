@@ -17,8 +17,10 @@ public:
     using confy::generic_option<string>::generic_option;
 };
 
-int main() {
+int main()
+{
 
+    std::string asd = "aAAAa";
     try
     {
         confy::config cfg("foo");
@@ -29,21 +31,17 @@ int main() {
             .verbose_stream(cout)
             ;
 
-        confy::section sec;
-
-        sec.add_option(std::make_unique<str>("asd", "a", "the asd"));
-        sec.add_option(std::make_unique<str>("bbbasd", "b", "the basda asd"));
-
-        cfg.add_section(std::move(sec));
-
-        confy::section sec2("zoo");
-
-        sec2.add_option(std::make_unique<str>("asd", "a", "the asd"));
-        sec2.add_option(std::make_unique<str>("bbbasd", "b", "the basda asd"));
-
-        cfg.add_section(std::move(sec2));
+        cfg.schema()
+            .opt<str>("foo", "f")
+                .desc("bar badsa sad as sa")
+                .val(asd)
+            .opt<str>("asd", "z")
+                .desc("asdassgd fdzzZZZZZas sa")
+                .env("ZXXX")
+            ;
 
         cfg.write_schema(cout);
+        //cfg.schema()
     }
     catch (std::exception& e)
     {

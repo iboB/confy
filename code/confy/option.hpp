@@ -5,6 +5,7 @@
 #include "impl/config_item.hpp"
 
 #include "value_source.hpp"
+#include "schema_dsl.hpp"
 
 #include <string>
 #include <iosfwd>
@@ -22,8 +23,10 @@ public:
     virtual ~option();
 
     const std::string& env_var() const { return m_env_var; }
+    void set_env_var(std::string_view v) { m_env_var = v; }
 
     bool no_env() const { return m_no_env; }
+    void set_no_env(bool s = true) { m_no_env = s; }
 
     value_source source() const { return m_source; }
 
@@ -43,6 +46,41 @@ public:
     // if the value is "default", it will try to set the default value
     // if the value set is a success, it will set m_source to the source
     virtual set_value_result try_set_value(std::string_view val, value_source source);
+
+    // schema
+    template <typename Option>
+    struct dsl_t
+    {
+    public:
+        dsl_t(Option& o, schema_dsl& dsl) : m_option(o), m_schema_dsl(dsl) {}
+
+        using dsl = typename Option::dsl;
+
+        dsl& name(std::string_view n) { m_option.set_name(n); return self(); }
+        dsl& abbr(std::string_view n) { m_option.set_abbr(n); return self(); }
+        dsl& desc(std::string_view n) { m_option.set_description(n); return self(); }
+        dsl& env(std::string_view n)
+        {
+            if (n.empty()) m_option.set_no_env();
+            else m_option.set_env_var(n);
+            return self();
+        }
+
+        schema_dsl& sec(std::string_view name, std::string_view abbr = {}, std::string_view desc = {}) { return m_schema_dsl.sec(name, abbr, desc); }
+
+        template <typename Other>
+        auto opt(std::string_view name, std::string_view abbr = {}, std::string_view desc = {}) { return m_schema_dsl.opt<Other>(name, abbr, desc); }
+
+    protected:
+        dsl& self()
+        {
+            return static_cast<dsl&>(*this);
+        }
+        Option& m_option;
+        schema_dsl& m_schema_dsl;
+    };
+
+    using dsl = dsl_t<option>;
 
     // command line and printing utils
 
@@ -70,7 +108,6 @@ protected:
     virtual bool set_from_default() = 0;
     virtual bool set_from_string(std::string_view str) = 0;
 
-    std::string m_description; // free form description
     std::string m_env_var; // associated environment variable name
     bool m_no_env = false; // don't use env var for this option only
 

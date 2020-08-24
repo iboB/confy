@@ -1,8 +1,10 @@
 #include "config.hpp"
 
 #include "option.hpp"
+#include "section.hpp"
 #include "config_error.hpp"
 #include "exception.hpp"
+#include "schema_dsl.hpp"
 
 #include "impl/cmd_line_util.inl"
 #include "impl/laurel.inl"
@@ -257,31 +259,25 @@ struct throw_t {} _throw;
 
 }
 
-void config::add_section(section new_sec)
+void config::add_section(std::unique_ptr<section> psec)
 {
-    // so as to allow abbreviated options without specifying abbreviated section names
-    if (new_sec.abbr().empty()) new_sec.m_abbr = new_sec.m_name;
+    auto& sec = *psec;
 
-    auto f = find(m_sections, by::any(new_sec));
+    // so as to allow abbreviated options without specifying abbreviated section names
+    if (sec.abbr().empty()) sec.m_abbr = sec.m_name;
+
+    auto f = find(m_sections, by::any(sec));
     if (f != m_sections.end())
     {
-        throw_duplicate_section(new_sec);
+        throw_duplicate_section(sec);
     }
 
-    new_sec.m_config = this;
-
-    // add section
-    auto& psec = m_sections.emplace_back(std::make_unique<section>(std::move(new_sec)));
-
-    for (auto& popt : psec->m_options)
-    {
-        popt->m_section = psec.get();
-    }
+    sec.m_config = this;
 
     // generate environment variable names
     if (!m_no_env)
     {
-        for (auto& popt : psec->m_options)
+        for (auto& popt : sec.m_options)
         {
             auto& opt = *popt;
             if (!opt.no_env() && opt.env_var().empty())
@@ -303,6 +299,13 @@ void config::add_section(section new_sec)
             }
         }
     }
+
+    m_sections.emplace_back(std::move(psec));
+}
+
+schema_dsl config::schema()
+{
+    return schema_dsl(*this);
 }
 
 void config::parse_ini_file(std::istream& in, std::string_view filename)
@@ -478,7 +481,7 @@ void config::write_schema(std::ostream& out, bool basic) const
             {
                 if (!opt.no_env())
                 {
-                    out << ", " << opt.env_var();
+                    out << ", e: " << opt.env_var();
                 }
                 if (!opt.is_command())
                 {
@@ -489,7 +492,7 @@ void config::write_schema(std::ostream& out, bool basic) const
                     }
                     else
                     {
-                        out << "Required!";
+                        out << ", Required!";
                     }
                 }
                 out << '\n';
@@ -529,8 +532,6 @@ void config::write_schema(std::ostream& out, bool basic) const
 }
 
 section::~section() = default;
-section::section(section&&) noexcept = default;
-section& section::operator=(section&&) noexcept = default;
 
 void section::add_option(std::unique_ptr<option> o)
 {
@@ -547,6 +548,9 @@ void section::add_option(std::unique_ptr<option> o)
     {
         throw_duplicate_option(*this, *o);
     }
+
+    o->m_section = this;
+
     m_options.emplace_back(std::move(o));
 }
 

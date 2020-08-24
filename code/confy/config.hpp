@@ -16,27 +16,9 @@ namespace confy
 {
 
 class option;
-class config;
+class section;
+class schema_dsl;
 class config_error;
-
-class CONFY_API section : public impl::config_item
-{
-public:
-    using impl::config_item::config_item;
-    ~section();
-
-    section(const section&) = delete;
-    section& operator=(const section&) = delete;
-    section(section&&) noexcept;
-    section& operator=(section&&) noexcept;
-
-    void add_option(std::unique_ptr<option> o);
-
-private:
-    friend class config;
-    config* m_config = nullptr;
-    std::vector<std::unique_ptr<option>> m_options;
-};
 
 class CONFY_API config
 {
@@ -79,7 +61,9 @@ public:
     // schema building
 
     // add a section with options
-    void add_section(section sec);
+    void add_section(std::unique_ptr<section> sec);
+
+    schema_dsl schema();
 
     ///////////////////////////////////////////////////////////////////////////
     // option parsing

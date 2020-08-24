@@ -11,6 +11,24 @@ class generic_option : public option
 public:
     using option::option;
 
+    void set_value_ptr(T* ptr)
+    {
+        m_value_ptr = ptr;
+        if (ptr) m_default_value = *ptr;
+    }
+
+    template <typename Option>
+    struct dsl_t : public option::dsl_t<Option>
+    {
+        using option::dsl_t<Option>::dsl_t;
+        dsl& val(T& v)
+        {
+            m_option.set_value_ptr(&v);
+            return self();
+        }
+    };
+    using dsl = dsl_t<generic_option<T>>;
+
     virtual void write_value_type(std::ostream& out) const final
     {
         out << m_value_type;
