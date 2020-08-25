@@ -30,8 +30,10 @@ public:
     }
 };
 
-namespace std {
-str* confy_get_option_for_value(string&) { return nullptr; }
+namespace confy
+{
+template <>
+struct option_for_type<std::string> { using type = str; };
 }
 
 enum xxx

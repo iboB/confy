@@ -96,6 +96,6 @@ protected:
 };
 
 template <typename T>
-auto confy_get_option_for_value(T&) -> std::enable_if_t<std::is_enum_v<T>, simple_enum<T>*> { return nullptr; }
+struct option_for_type<T, std::enable_if_t<std::is_enum_v<T>>> { using type = typename simple_enum<T>; };
 
 }
