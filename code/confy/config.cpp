@@ -531,9 +531,13 @@ void config::write_schema(std::ostream& out, bool basic) const
             }
             else
             {
-                out << "\n    ";
-                opt.write_value_type_desc(out);
                 out << '\n';
+                if (!opt.is_command())
+                {
+                    out << "    ";
+                    opt.write_value_type_desc(out);
+                    out << '\n';
+                }
 
                 if (!opt.description().empty())
                 {

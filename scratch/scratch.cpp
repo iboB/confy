@@ -11,6 +11,7 @@
 #include <confy/types/generic_option.hpp>
 #include <confy/types/simple_enum.hpp>
 #include <confy/types/string.hpp>
+#include <confy/types/boolean.hpp>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ int main()
 
     std::string asd = "aAAAa";
     xxx x = c;
+    bool start = false;
     try
     {
         confy::config cfg("foo");
@@ -46,9 +48,14 @@ int main()
                 .e("baz")
                 .desc("asdassgd fdzzZZZZZas sa")
                 .env("ZXXX")
+            .opt(start, "start")
+                .desc("start all the stuff when starting app")
+            .sec("bbaba", "ba", "the baba stuff")
+                .opt(start, "start")
+                    .desc("start all the stuff when starting app")
             ;
 
-        cfg.write_schema(cout);
+        cfg.write_schema(cout, true);
         //cfg.schema()
     }
     catch (std::exception& e)
