@@ -82,10 +82,10 @@ public:
         {
             return m_schema_dsl.cmd<Other>(name, abbr, desc);
         }
-        template <typename Option, typename Value>
+        template <typename Other, typename Value>
         auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
         {
-            return m_schema_dsl.opt<Option, Value>(val, name, abbr, desc);
+            return m_schema_dsl.opt<Other, Value>(val, name, abbr, desc);
         }
         template <typename Value>
         auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})

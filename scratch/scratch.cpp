@@ -29,7 +29,9 @@ public:
     }
 };
 
-str* confy_get_option_for_value(std::string&) { return nullptr; }
+namespace std {
+str* confy_get_option_for_value(string&) { return nullptr; }
+}
 
 int main()
 {
