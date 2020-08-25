@@ -19,16 +19,10 @@ class generic_option : public basic_option<T>
 public:
     using basic_option<T>::basic_option;
 
-    void set_value_ptr(T* ptr)
-    {
-        m_value_ptr = ptr;
-        if (ptr) m_default_value = *ptr;
-    }
-
     template <typename Option>
-    struct dsl_t : public basic_option::dsl_t<Option>
+    struct dsl_t : public basic_option<T>::template dsl_t<Option>
     {
-        using basic_option::dsl_t<Option>::dsl_t;
+        using basic_option<T>::template dsl_t<Option>::dsl_t;
     };
     using dsl = dsl_t<generic_option<T>>;
 
@@ -45,7 +39,7 @@ public:
 
     virtual void write_default_value(std::ostream& out) const final
     {
-        if (m_default_value) out << *m_default_value;
+        if (this->m_default_value) out << *this->m_default_value;
     }
 
 protected:
