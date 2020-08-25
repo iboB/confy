@@ -150,7 +150,7 @@ public:
             break;
         case option::set_value_result::bad_source:
             e.type = config_error::bad_source;
-            sout << "The source was malformed.";
+            sout << "The option doesn't accept the provided source.";
             break;
         default:
             assert(false);
