@@ -45,7 +45,7 @@ int main()
 {
 
     std::string asd = "aAAAa";
-    xxx x;
+    xxx x = c;
     try
     {
         confy::config cfg("foo");
@@ -59,6 +59,9 @@ int main()
         cfg.schema()
             .opt(asd, "foo", "f", "bar badsa sad as sa")
             .opt(x, "zzz", "b", "enum type")
+                .e(a, "a")
+                .e(b, "b")
+                .e(c, "c")
             .cmd<str>("asd", "z")
                 .desc("asdassgd fdzzZZZZZas sa")
                 .env("ZXXX")
