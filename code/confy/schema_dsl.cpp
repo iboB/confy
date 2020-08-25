@@ -30,6 +30,14 @@ schema_dsl::~schema_dsl() noexcept(false)
     add_cur_section();
 }
 
+schema_dsl& schema_dsl::sec(std::string_view name, std::string_view abbr, std::string_view desc)
+{
+    add_cur_option();
+    add_cur_section();
+    m_cur_section = std::make_unique<section>(name, abbr, desc);
+    return *this;
+}
+
 void schema_dsl::add_cur_option()
 {
     if (m_cur_option)
