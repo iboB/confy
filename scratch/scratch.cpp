@@ -9,6 +9,7 @@
 
 #include <confy/confy.hpp>
 #include <confy/types/generic_option.hpp>
+#include <confy/types/simple_enum.hpp>
 
 using namespace std;
 
@@ -33,10 +34,16 @@ namespace std {
 str* confy_get_option_for_value(string&) { return nullptr; }
 }
 
+enum xxx
+{
+    a, b, c
+};
+
 int main()
 {
 
     std::string asd = "aAAAa";
+    xxx x;
     try
     {
         confy::config cfg("foo");
@@ -49,6 +56,7 @@ int main()
 
         cfg.schema()
             .opt(asd, "foo", "f", "bar badsa sad as sa")
+            .opt(x, "zzz", "b", "enum type")
             .cmd<str>("asd", "z")
                 .desc("asdassgd fdzzZZZZZas sa")
                 .env("ZXXX")

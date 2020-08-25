@@ -90,7 +90,7 @@ public:
         template <typename Value>
         auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
         {
-            return m_schema_dsl.opt<Value>(val, name, abbr, desc);
+            return m_schema_dsl.opt(val, name, abbr, desc);
         }
 
     protected:
