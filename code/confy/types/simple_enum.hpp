@@ -19,21 +19,15 @@ class simple_enum : public basic_option<T>
 public:
     using basic_option<T>::basic_option;
 
-    void set_value_ptr(T* ptr)
-    {
-        m_value_ptr = ptr;
-        if (ptr) m_default_value = *ptr;
-    }
-
     void add_element(T e, std::string_view name)
     {
         m_elements.emplace_back(element{ std::string(name), e });
     }
 
     template <typename Option>
-    struct dsl_t : public basic_option::dsl_t<Option>
+    struct dsl_t : public basic_option<T>::template dsl_t<Option>
     {
-        using basic_option::dsl_t<Option>::dsl_t;
+        using basic_option<T>::template dsl_t<Option>::dsl_t;
 
         auto& e(T e, std::string_view name)
         {
@@ -63,11 +57,11 @@ public:
 
     virtual void write_default_value(std::ostream& out) const final
     {
-        if (!m_default_value) return;
+        if (!this->m_default_value) return;
 
         for (auto& e : m_elements)
         {
-            if (e.value == *m_default_value)
+            if (e.value == *this->m_default_value)
             {
                 out << e.name;
                 return;
