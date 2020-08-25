@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <cstdlib>
 #include <algorithm>
 
 namespace confy
@@ -421,7 +422,20 @@ void config::update_options()
                 // first look for env_var
                 if (!m_no_env && !opt->no_env())
                 {
-
+                    assert(!opt->env_var().empty());
+                    auto pvalue = std::getenv(opt->env_var().c_str());
+                    if (pvalue)
+                    {
+                        std::string_view val = pvalue;
+                        if (opt->set_from_string(val))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            m_config_errors->bad_set_value(*opt, val, value_source::env_var, option::set_value_result::bad_value);
+                        }
+                    }
                 }
 
                 // if env var was unavailable set default val
