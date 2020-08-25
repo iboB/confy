@@ -117,6 +117,9 @@ public:
 
     void parser_add_source_error(std::string_view error);
 
+    const std::vector<std::unique_ptr<section>>& sections() const { return m_sections; }
+    void generate_option_env_var(option& opt);
+
     ///////////////////////////////////////////////////////////////////////////
     // utils
 

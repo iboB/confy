@@ -31,6 +31,8 @@ public:
 
     void add_option(std::unique_ptr<option> o);
 
+    const std::vector<std::unique_ptr<option>>& options() const { return m_options; }
+
 private:
     friend class config;
     config* m_config = nullptr;

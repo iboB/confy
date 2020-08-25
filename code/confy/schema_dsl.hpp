@@ -27,8 +27,15 @@ public:
     schema_dsl(config& cfg);
     ~schema_dsl() noexcept(false); // this destructor can throw exceptions!
 
+    // add section (must have at least a name)
     schema_dsl& sec(std::string_view name, std::string_view abbr = {}, std::string_view desc = {});
 
+    // note that the option-definition functions have default values for the name
+    // options can potentially set their own name in their constructors
+    // thus requiring it here will be redundant
+
+    // add command
+    // a command is an option which is not necessarily bound to a value
     template <typename Option>
     auto cmd(std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
     {
@@ -37,6 +44,7 @@ public:
         return typename Option::dsl(static_cast<Option&>(*m_cur_option), *this);
     }
 
+    // add options bound to a given value
     template <typename Option, typename Value>
     auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
     {

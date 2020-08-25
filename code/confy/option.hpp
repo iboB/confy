@@ -52,9 +52,12 @@ public:
     // the default implementation will try to set the value from the given source
     // if the value is "default", it will try to set the default value
     // if the value set is a success, it will set m_source to the source
+    // you can override this function and guard for specifc sources and execute code
+    // this is useful for command-like options
     virtual set_value_result try_set_value(std::string_view val, value_source source);
 
-    // schema
+    // dsl to define a schema
+    // it's instantiated by the schema_dsl opt/cmd functions
     template <typename Option>
     struct dsl_t
     {
@@ -72,6 +75,10 @@ public:
             else m_option.set_env_var(n);
             return self();
         }
+
+        // following are redirecting functions which just call the schema_dls's ones
+        // so one can write .opt(...).opt(...).sec(...).opt(...) to define multiple options and sections
+        // withing the same schema
 
         schema_dsl& sec(std::string_view name, std::string_view abbr = {}, std::string_view desc = {})
         {

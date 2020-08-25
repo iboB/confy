@@ -148,6 +148,10 @@ public:
             sout << " was incompatible with the expected format: ";
             opt.write_value_type_desc(sout);
             break;
+        case option::set_value_result::bad_source:
+            e.type = config_error::bad_source;
+            sout << "The source was malformed.";
+            break;
         default:
             assert(false);
         }
@@ -185,6 +189,7 @@ config::~config() = default;
 
 namespace
 {
+// utility class to easily search by name or abbr
 struct by
 {
     using key = impl::config_item;
@@ -287,28 +292,34 @@ void config::add_section(std::unique_ptr<section> psec)
     {
         for (auto& popt : sec.m_options)
         {
-            auto& opt = *popt;
-            if (!opt.no_env() && opt.env_var().empty())
-            {
-                std::ostringstream sout;
-                sout << m_env_var_prefix;
-                output_path(sout, opt);
-                opt.m_env_var = sout.str();
-
-                // fix risky characters
-                for (auto& c : opt.m_env_var)
-                {
-                    if (!isalnum(c) && c != '_')
-                    {
-                        c = '_';
-                    }
-                    // should we toupper?
-                }
-            }
+            generate_option_env_var(*popt);
         }
     }
 
     m_sections.emplace_back(std::move(psec));
+}
+
+void config::generate_option_env_var(option& opt)
+{
+    assert(!m_no_env); // should be checked externally
+
+    if (!opt.no_env() && opt.env_var().empty())
+    {
+        std::ostringstream sout;
+        sout << m_env_var_prefix;
+        output_path(sout, opt);
+        opt.m_env_var = sout.str();
+
+        // fix risky characters
+        for (auto& c : opt.m_env_var)
+        {
+            if (!isalnum(c) && c != '_')
+            {
+                c = '_';
+            }
+            // should we toupper?
+        }
+    }
 }
 
 schema_dsl config::schema()
@@ -571,6 +582,16 @@ void section::add_option(std::unique_ptr<option> o)
     }
 
     o->m_section = this;
+
+    if (m_config)
+    {
+        // this section is already added to the config and we're adding an option
+        // we need to generate its enviroment variable
+        if (!m_config->no_env())
+        {
+            m_config->generate_option_env_var(*o);
+        }
+    }
 
     m_options.emplace_back(std::move(o));
 }

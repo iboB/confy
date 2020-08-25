@@ -13,6 +13,9 @@
 namespace confy
 {
 
+// config errors are not exceptions
+// all errors will be collected into a vector and can be queried
+// potentially an app might want to continue working with config_errors
 class config_error
 {
 public:
