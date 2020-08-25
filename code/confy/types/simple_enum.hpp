@@ -96,6 +96,6 @@ protected:
 };
 
 template <typename T>
-struct option_for_type<T, std::enable_if_t<std::is_enum_v<T>>> { using type = typename simple_enum<T>; };
+struct option_for_type<T, std::enable_if_t<std::is_enum_v<T>>> { using type = simple_enum<T>; };
 
 }
