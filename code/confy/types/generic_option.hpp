@@ -71,12 +71,14 @@ protected:
     virtual bool set_from_string(std::string_view str) final
     {
         T val;
-        if (!confy_from_string(val, str)) return false;
+        if (!do_set_from_string(val, str)) return false;
         if (!validate(val)) return false;
         if (!m_value_ptr) return true;
         *m_value_ptr = std::move(val);
         return true;
     }
+
+    virtual bool do_set_from_string(T& val, std::string_view str) = 0;
 
     T* m_value_ptr = nullptr;
     std::optional<T> m_default_value;

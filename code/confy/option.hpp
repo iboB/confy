@@ -66,10 +66,25 @@ public:
             return self();
         }
 
-        schema_dsl& sec(std::string_view name, std::string_view abbr = {}, std::string_view desc = {}) { return m_schema_dsl.sec(name, abbr, desc); }
-
+        schema_dsl& sec(std::string_view name, std::string_view abbr = {}, std::string_view desc = {})
+        {
+            return m_schema_dsl.sec(name, abbr, desc);
+        }
         template <typename Other>
-        auto opt(std::string_view name, std::string_view abbr = {}, std::string_view desc = {}) { return m_schema_dsl.opt<Other>(name, abbr, desc); }
+        auto cmd(std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
+        {
+            return m_schema_dsl.cmd<Other>(name, abbr, desc);
+        }
+        template <typename Option, typename Value>
+        auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
+        {
+            return m_schema_dsl.opt<Option, Value>(val, name, abbr, desc);
+        }
+        template <typename Value>
+        auto opt(Value& val, std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
+        {
+            return m_schema_dsl.opt<Value>(val, name, abbr, desc);
+        }
 
     protected:
         dsl& self()
@@ -77,6 +92,7 @@ public:
             return static_cast<dsl&>(*this);
         }
         Option& m_option;
+    private:
         schema_dsl& m_schema_dsl;
     };
 

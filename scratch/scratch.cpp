@@ -5,20 +5,24 @@
 
 using namespace std;
 
-namespace std
-{
-bool confy_from_string(string& out, string_view in)
-{
-    out = in;
-    return true;
-}
-}
-
 class str : public confy::generic_option<std::string>
 {
 public:
-    using confy::generic_option<string>::generic_option;
+    str(std::string_view name = {}, std::string_view abbr = {}, std::string_view desc = {})
+        : confy::generic_option<std::string>(name, abbr, desc)
+    {
+        m_value_type = "string";
+        m_value_type_desc = "a text string";
+    }
+
+    virtual bool do_set_from_string(std::string& val, std::string_view str)
+    {
+        val = str;
+        return true;
+    }
 };
+
+str* confy_get_option_for_value(std::string&) { return nullptr; }
 
 int main()
 {
@@ -35,10 +39,8 @@ int main()
             ;
 
         cfg.schema()
-            .opt<str>("foo", "f")
-                .desc("bar badsa sad as sa")
-                .val(asd)
-            .opt<str>("asd", "z")
+            .opt(asd, "foo", "f", "bar badsa sad as sa")
+            .cmd<str>("asd", "z")
                 .desc("asdassgd fdzzZZZZZas sa")
                 .env("ZXXX")
             ;
