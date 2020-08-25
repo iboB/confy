@@ -12,9 +12,7 @@
 #include <string>
 #include <string_view>
 
-namespace confy
-{
-namespace impl
+namespace confy::impl
 {
 class CONFY_API config_item
 {
@@ -45,5 +43,4 @@ protected:
     std::string m_abbr;
     std::string m_description;
 };
-}
 }

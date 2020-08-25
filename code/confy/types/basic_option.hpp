@@ -43,7 +43,7 @@ public:
     }
 
 protected:
-    virtual bool validate(const T&) { return true; }
+    virtual bool validate(const T&) const { return true; }
 
     virtual bool set_from_default() final
     {

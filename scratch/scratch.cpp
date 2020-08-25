@@ -12,6 +12,8 @@
 #include <confy/types/simple_enum.hpp>
 #include <confy/types/string.hpp>
 #include <confy/types/boolean.hpp>
+#include <confy/types/integer.hpp>
+#include <confy/types/real.hpp>
 
 using namespace std;
 
@@ -26,6 +28,8 @@ int main()
     std::string asd = "aAAAa";
     xxx x = c;
     bool start = false;
+    int i = 324;
+    double d = 34.11;
     try
     {
         confy::config cfg("foo");
@@ -53,9 +57,13 @@ int main()
             .sec("bbaba", "ba", "the baba stuff")
                 .opt(start, "start")
                     .desc("start all the stuff when starting app")
+                .opt(i, "iii", "i", "the int")
+                .opt(d, "ddd", "d", "the double")
+                    .min(1)
+                    .max(233)
             ;
 
-        cfg.write_schema(cout, true);
+        cfg.write_schema(cout);
         //cfg.schema()
     }
     catch (std::exception& e)

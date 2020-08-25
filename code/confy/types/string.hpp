@@ -62,19 +62,20 @@ public:
         }
     }
 
-    virtual bool do_set_from_string(std::string& val, std::string_view str)
+    virtual bool do_set_from_string(std::string& val, std::string_view str) override final
     {
-        if (m_enum.empty())
-        {
-            val = str;
-            return true;
-        }
+        val = str;
+        return true;
+    }
+
+    virtual bool validate(const std::string& val) const override final
+    {
+        if (m_enum.empty()) return true;
 
         for (const auto& e : m_enum)
         {
-            if (e == str)
+            if (e == val)
             {
-                val = e;
                 return true;
             }
         }
