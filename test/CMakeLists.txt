@@ -27,6 +27,7 @@ endmacro()
 
 add_impl_test(cmd_line_util t-cmd_line_util.cpp)
 add_impl_test(laurel t-laurel.cpp)
+add_impl_test(setenv t-setenv.cpp)
 
 macro(add_confu_test test)
     add_lib_test(${test} confy ${ARGN})

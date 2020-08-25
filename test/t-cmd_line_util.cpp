@@ -10,6 +10,8 @@
 
 #include <vector>
 
+TEST_SUITE_BEGIN("command line utils");
+
 TEST_CASE("arg_split")
 {
     auto t = split_option_path("");
