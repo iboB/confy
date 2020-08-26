@@ -116,7 +116,7 @@ public:
 
     // you can override this with `return true` on boolean option with false defaults
     // this will provide a prettier schema output
-    virtual bool is_command() const { return false; }
+    virtual bool is_default_false() const { return false; }
 
     // print the value type
     virtual void write_value_type(std::ostream& out) const = 0;

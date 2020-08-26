@@ -47,7 +47,7 @@ public:
         return false;
     }
 
-    bool is_command() const override final { return m_default_value && !*m_default_value; }
+    bool is_default_false() const override final { return m_default_value && !*m_default_value; }
 };
 
 template <>

@@ -489,7 +489,7 @@ void config::write_schema(std::ostream& out, bool basic) const
             auto& opt = *popt;
             out << "--" << m_cmd_prefix;
             output_path(out, opt);
-            if (!opt.is_command())
+            if (!opt.is_default_false())
             {
                 out << "=<";
                 opt.write_value_type(out);
@@ -501,7 +501,7 @@ void config::write_schema(std::ostream& out, bool basic) const
                 out << ", -" << m_cmd_prefix;
                 if (!sec.abbr().empty()) out << sec.abbr() << SECTION_DELIM;
                 out << opt.abbr();
-                if (!opt.is_command())
+                if (!opt.is_default_false())
                 {
                     out << "=<";
                     opt.write_value_type(out);
@@ -515,7 +515,7 @@ void config::write_schema(std::ostream& out, bool basic) const
                 {
                     out << ", e: " << opt.env_var();
                 }
-                if (!opt.is_command())
+                if (!opt.is_default_false())
                 {
                     if (opt.has_default_value())
                     {
@@ -532,7 +532,7 @@ void config::write_schema(std::ostream& out, bool basic) const
             else
             {
                 out << '\n';
-                if (!opt.is_command())
+                if (!opt.is_default_false())
                 {
                     out << "    ";
                     opt.write_value_type_desc(out);
@@ -549,7 +549,7 @@ void config::write_schema(std::ostream& out, bool basic) const
                     out << "    Environment variable: " << opt.env_var() << '\n';
                 }
 
-                if (!opt.is_command())
+                if (!opt.is_default_false())
                 {
                     if (opt.has_default_value())
                     {
