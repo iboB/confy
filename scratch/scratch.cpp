@@ -12,7 +12,7 @@
 
 using namespace std;
 
-enum xxx
+enum my_enum
 {
     a, b, c
 };
@@ -21,7 +21,7 @@ int main()
 {
 
     std::string asd = "aAAAa";
-    xxx x = c;
+    auto x = c;
     bool start = false;
     int i = 324;
     double d = 34.11;

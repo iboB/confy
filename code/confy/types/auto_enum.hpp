@@ -28,7 +28,7 @@ public:
 
     virtual void write_value_type(std::ostream& out) const final
     {
-        out << magic_enum::enum_type_name<T>();
+        out << magic_enum::enum_type_name<T>().substr(7);
     }
 
     virtual void write_value_type_desc(std::ostream& out) const override
