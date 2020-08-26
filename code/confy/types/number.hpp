@@ -59,7 +59,9 @@ public:
 
     virtual bool validate(const Num& val) const override
     {
-        return val >= m_min && val <= m_max;
+        if (m_min && val < *m_min) return false;
+        if (m_max && val > *m_max) return false;
+        return true;
     }
 
 protected:

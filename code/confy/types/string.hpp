@@ -8,6 +8,8 @@
 #pragma once
 #include "generic_option.hpp"
 
+#include <vector>
+
 namespace confy
 {
 

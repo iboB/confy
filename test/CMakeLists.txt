@@ -30,6 +30,8 @@ add_impl_test(laurel t-laurel.cpp)
 add_impl_test(setenv t-setenv.cpp)
 add_impl_test(num_from_string t-num_from_string.cpp)
 
-macro(add_confu_test test)
+macro(add_confy_test test)
     add_lib_test(${test} confy ${ARGN})
 endmacro()
+
+add_confy_test(types t-types.cpp)

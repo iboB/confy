@@ -68,7 +68,7 @@ public:
             }
         }
 
-        out << "*unkown*";
+        out << "*unknown*";
     }
 
 protected:

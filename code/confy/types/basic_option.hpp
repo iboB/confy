@@ -47,7 +47,7 @@ protected:
 
     virtual bool set_from_default() final
     {
-        if (m_default_value) return false;
+        if (!m_default_value) return false;
         if (!validate(*m_default_value)) return false;
         if (!m_value_ptr) return true; // successful non-set :)
         *m_value_ptr = *m_default_value;

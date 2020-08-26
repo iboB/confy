@@ -5,7 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "../option.hpp"
+#include "basic_option.hpp"
 
 namespace confy
 {
