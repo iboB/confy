@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-enum class role
+enum class role_t
 {
     ceo, employee, intern
 };
@@ -20,7 +20,7 @@ struct configuration
 {
     std::string name;
     int age = 0;
-    role role = role::intern;
+    role_t role = role_t::intern;
 };
 
 int main(int argc, char* argv[])
