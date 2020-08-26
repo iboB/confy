@@ -75,7 +75,7 @@ public:
     }
 
     // error constructors
-    config_event& make_error()
+    config_event& make_event()
     {
         auto& e = events.emplace_back();
         if (!m_sources_stack.empty())
@@ -88,93 +88,100 @@ public:
 
     void no_section(std::string_view name, bool is_abbr)
     {
-        auto& e = make_error();
-        e.type = config_event::no_such_section;
+        auto& e = make_event();
+        e.type = config_event::missing_error;
+        e.is_abbr = is_abbr;
         e.section_name = name;
-
-        ostr out;
-        out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " section `" << name << "`. No option values will be set from it";
-        e.text = out.str();
+        //ostr out;
+        //out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " section `" << name << "`. No option values will be set from it";
+        //e.text = out.str();
     }
 
     void no_option(std::string_view sec, std::string_view opt, bool is_abbr)
     {
-        auto& e = make_error();
-        e.type = config_event::no_such_option;
+        auto& e = make_event();
+        e.type = config_event::missing_error;
+        e.is_abbr = is_abbr;
         e.section_name = sec;
         e.option_name = opt;
-
-        ostr out;
-        out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " option `" << sec << SECTION_DELIM << opt << "`.";
-        e.text = out.str();
+        //ostr out;
+        //out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " option `" << sec << SECTION_DELIM << opt << "`.";
+        //e.text = out.str();
     }
 
     void source_error(std::string_view error)
     {
-        auto& e = make_error();
-        e.type = config_event::bad_source;
-
-        ostr out;
-        out << "error in " << e.source_name << ": " << error;
-        e.text = out.str();
+        auto& e = make_event();
+        e.type = config_event::source_error;
+        e.text = error;
+        //ostr out;
+        //out << "error in " << e.source_name << ": " << error;
+        //e.text = out.str();
     }
 
     void bad_set_value(const option& opt, std::string_view value, value_source source, option::set_value_result result)
     {
-        auto& e = make_error();
+        auto& e = make_event();
         if (source == value_source::env_var)
         {
             e.source = source;
             e.source_name = "environment variable";
         }
-
-        std::ostringstream sout;
-        sout << "error setting value \"" << value << "\" to option " << opt << ". ";
-        switch (result)
-        {
-        case option::set_value_result::same_source_value:
-            e.type = config_event::same_source_value;
-            sout << "A different value was set with the same source priority.";
-            break;
-        case option::set_value_result::bad_value:
-            e.type = config_event::bad_value;
-            sout << "The expected value format is ";
-            opt.write_value_type_desc(sout);
-            break;
-        case option::set_value_result::bad_default:
-            e.type = config_event::bad_default;
-            sout << "The requested default value ";
-            opt.write_default_value(sout);
-            sout << " was incompatible with the expected format: ";
-            opt.write_value_type_desc(sout);
-            break;
-        case option::set_value_result::bad_source:
-            e.type = config_event::bad_source;
-            sout << "The option doesn't accept the provided source.";
-            break;
-        default:
-            assert(false);
-        }
-
+        e.type = config_event::set_error;
         e.section_name = opt.m_section->name();
         e.option_name = opt.name();
+        e.provided_value = value;
         e.opt = &opt;
-        e.text = sout.str();
+        e.set_value_result = result;
+        //std::ostringstream sout;
+        //sout << "error setting value \"" << value << "\" to option " << opt << ". ";
+        //switch (result)
+        //{
+        //case option::set_value_result::same_source_value:
+        //    e.type = config_event::same_source_value;
+        //    sout << "A different value was set with the same source priority.";
+        //    break;
+        //case option::set_value_result::bad_value:
+        //    e.type = config_event::bad_value;
+        //    sout << "The expected value format is ";
+        //    opt.write_value_type_desc(sout);
+        //    break;
+        //case option::set_value_result::bad_default:
+        //    e.type = config_event::bad_default;
+        //    sout << "The requested default value ";
+        //    opt.write_default_value(sout);
+        //    sout << " was incompatible with the expected format: ";
+        //    opt.write_value_type_desc(sout);
+        //    break;
+        //case option::set_value_result::bad_source:
+        //    e.type = config_event::bad_source;
+        //    sout << "The option doesn't accept the provided source.";
+        //    break;
+        //default:
+        //    assert(false);
+        //}
+        //e.text = sout.str();
     }
 
     void no_value(const option& opt)
     {
-        auto& e = make_error();
+        auto& e = make_event();
         e.source = value_source::default_val;
         e.source_name = "fallback to default value";
-        e.type = config_event::bad_default;
+        e.type = config_event::set_error;
         e.section_name = opt.m_section->name();
         e.option_name = opt.name();
+        if (opt.has_default_value())
+        {
+            std::ostringstream sout;
+            opt.write_default_value(sout);
+            e.provided_value = sout.str();
+        }
         e.opt = &opt;
-
-        ostr out;
-        out << "VALUE SET FAILED on " << opt;
-        e.text = out.str();
+        e.set_value_result = option_set_value_result::bad_default;
+        //ostr out;
+        //out << "VALUE SET FAILED on " << opt;
+        //e.text = out.str();
     }
 };
 

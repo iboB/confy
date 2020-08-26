@@ -8,7 +8,10 @@
 #pragma once
 
 #include "value_source.hpp"
+#include "option_set_value_result.hpp"
+
 #include <string>
+#include <optional>
 
 namespace confy
 {
@@ -20,27 +23,33 @@ namespace confy
 class config_event
 {
 public:
-    value_source source;
-    std::string source_name;
-
-    enum type_
+    enum event_type
     {
-        bad_source, // the source of the value was malformed
-        no_such_section, // configuration referred to a section which was not defined in schema
-        no_such_option, // configuration tried to set value to an option that was not defined in schema
-        same_source_value, // value was provided multiple times from the same source
-        bad_value, // provided value of option was incompatible
-        bad_default, // default value of option was missing or incompatible
+        verbose, // not an error. Only created if verbose is on
+        source_error, // the source was malformed
+        missing_error, // configuration referred to a section or option which was not defined in the schema
+        set_error, // the setting of an option failed
     };
-    type_ type;
+    event_type type = verbose;
 
-    std::string section_name; // contains the referred section name
-    std::string option_name; // contains the referred option name
-    std::string provided_value; // what value was provided from the config
+    bool is_error() const { return type > verbose; }
+
+    value_source source; // data source of error
+    std::string source_name; // name of source
+
+    bool is_abbr = false; // are the section and option names abbreviations
+    std::optional<std::string> section_name; // contains the referred section name if any
+    std::optional<std::string> option_name; // contains the referred option name if any
+
+    std::optional<std::string> provided_value; // what value was provided from the config if any
+
     const option* opt = nullptr; // if not null, will contain the option which was referred
+    std::optional<option_set_value_result> set_value_result; // the result of the set value op if any
 
     // optional free-form text of the event
-    std::string text;
+    // confy only writes here when parsing ini files
+    // otherwise it can be filled by a user-provided extension
+    std::optional<std::string> text;
 };
 
 }
