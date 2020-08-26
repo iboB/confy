@@ -34,4 +34,8 @@ macro(add_confy_test test)
     add_lib_test(${test} confy ${ARGN})
 endmacro()
 
-add_confy_test(types t-types.cpp)
+add_confy_test(types
+    t-types.cpp
+    t-simple_enum.cpp
+    t-auto_enum.cpp
+)

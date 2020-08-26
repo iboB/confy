@@ -5,42 +5,16 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "doctest.hpp"
+#include "t-types.hpp"
 
-#include <confy/types.hpp>
+#include <confy/types/boolean.hpp>
+#include <confy/types/integer.hpp>
+#include <confy/types/real.hpp>
+#include <confy/types/string.hpp>
 
 using namespace confy;
 
-TEST_SUITE_BEGIN("confy types");
-
-template <typename T>
-struct type_test
-{
-    std::string value;
-    value_source source;
-
-    option::set_value_result expected_result;
-    T expected_value;
-};
-
-template <typename Option, typename T>
-void test(Option& opt, T initial_value, std::vector<type_test<T>> tests)
-{
-    T val = initial_value;
-    opt.set_value_ptr(&val);
-
-    for (auto& t : tests)
-    {
-        auto r = opt.try_set_value(t.value, t.source);
-        CHECK(r == t.expected_result);
-        CHECK(val == t.expected_value);
-    }
-
-    opt.set_value_ptr(nullptr);
-}
-
-using vs = value_source;
-using svr = option::set_value_result;
+TEST_SUITE_BEGIN("basic types");
 
 TEST_CASE("boolean")
 {
@@ -179,36 +153,5 @@ TEST_CASE("string")
         {"yyy", vs::config_file, svr::success, "yyy"},
         {"zzz", vs::cmd_line, svr::success, "zzz"},
         {"default", vs::manual_override, svr::bad_default, "zzz"},
-    });
-}
-
-
-enum order { first, second, third };
-
-TEST_CASE("enum")
-{
-    simple_enum<order> e;
-    e.add_element(first, "first");
-    e.add_element(third, "third");
-    e.add_element(second, "second");
-
-    test(e, first, {
-        {"first", vs::env_var, svr::success, first},
-        {"second", vs::env_var, svr::same_source_value, first},
-        {"second", vs::config_file, svr::success, second},
-        {"first", vs::env_var, svr::skipped, second},
-        {"ffff", vs::cmd_line, svr::bad_value, second},
-        {"third", vs::cmd_line, svr::success, third},
-        {"default", vs::env_var, svr::skipped, third},
-        {"default", vs::manual_override, svr::success, first},
-    });
-
-    simple_enum<order> e2;
-    e2.add_element(first, "first");
-    e2.add_element(third, "third");
-    test(e2, second, {
-        {"first", vs::env_var, svr::success, first},
-        {"second", vs::config_file, svr::bad_value, first},
-        {"default", vs::cmd_line, svr::success, second},
     });
 }

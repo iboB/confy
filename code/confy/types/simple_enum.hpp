@@ -6,7 +6,8 @@
 // https://opensource.org/licenses/MIT
 //
 #pragma once
-#include "../option.hpp"
+#if !CONFY_NO_SIMPLE_ENUM
+#include "basic_option.hpp"
 
 #include <optional>
 #include <ostream>
@@ -100,3 +101,4 @@ template <typename T>
 struct option_for_type<T, std::enable_if_t<std::is_enum_v<T>>> { using type = simple_enum<T>; };
 
 }
+#endif // !CONFY_NO_SIMPLE_ENUM
