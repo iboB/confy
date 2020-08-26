@@ -8,12 +8,7 @@
 #include <iostream>
 
 #include <confy/confy.hpp>
-#include <confy/types/generic_option.hpp>
-#include <confy/types/simple_enum.hpp>
-#include <confy/types/string.hpp>
-#include <confy/types/boolean.hpp>
-#include <confy/types/integer.hpp>
-#include <confy/types/real.hpp>
+#include <confy/types.hpp>
 
 using namespace std;
 
@@ -43,9 +38,6 @@ int main()
         cfg.schema()
             .opt(asd, "foo", "f", "bar badsa sad as sa")
             .opt(x, "zzz", "b", "enum type")
-                .e(a, "a")
-                .e(b, "b")
-                .e(c, "c")
             .cmd<confy::string>("asd", "z")
                 .e("foo")
                 .e("bar")

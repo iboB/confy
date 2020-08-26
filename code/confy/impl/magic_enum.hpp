@@ -66,7 +66,7 @@
 #  define MAGIC_ENUM_RANGE_MAX 128
 #endif
 
-namespace magic_enum {
+namespace confy::magic_enum {
 
 // Enum value must be in range [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX]. By default MAGIC_ENUM_RANGE_MIN = -128, MAGIC_ENUM_RANGE_MAX = 128.
 // If need another range for all enum types by default, redefine the macro MAGIC_ENUM_RANGE_MIN and MAGIC_ENUM_RANGE_MAX.

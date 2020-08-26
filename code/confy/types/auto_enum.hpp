@@ -11,6 +11,10 @@
 
 #include "../impl/magic_enum.hpp"
 
+#if !MAGIC_ENUM_SUPPORTED
+#   error This compiler doesn't support magic_enum, so it can't support confy::auto_enum
+#endif
+
 #include <ostream>
 #include <type_traits>
 

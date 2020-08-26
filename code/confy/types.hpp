@@ -11,5 +11,5 @@
 #include "types/integer.hpp"
 #include "types/real.hpp"
 #include "types/string.hpp"
-#include "types/simple_enum.hpp"
+#include "types/auto_enum.hpp"
 #include "types/function.hpp"
