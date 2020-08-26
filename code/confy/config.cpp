@@ -404,7 +404,7 @@ void config::parser_add_source_error(std::string_view error)
 void config::do_set_option_value(option& opt, std::string_view value, value_source source)
 {
     auto result = opt.try_set_value(value, source);
-    if (result > option::set_value_result::skipped) return;
+    if (result <= option::set_value_result::skipped) return;
     m_config_errors->bad_set_value(opt, value, source, result);
 }
 

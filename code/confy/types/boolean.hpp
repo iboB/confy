@@ -8,6 +8,8 @@
 #pragma once
 #include "basic_option.hpp"
 
+#include <ostream>
+
 namespace confy
 {
 class boolean : public basic_option<bool>

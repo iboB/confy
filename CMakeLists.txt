@@ -42,6 +42,10 @@ if(CONFY_BUILD_SCRATCH)
     add_subdirectory(scratch)
 endif()
 
+if(CONFY_BUILD_EXAMPLES)
+    add_subdirectory(example)
+endif()
+
 if(CONFY_BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)

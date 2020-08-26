@@ -39,3 +39,7 @@ add_confy_test(types
     t-simple_enum.cpp
     t-auto_enum.cpp
 )
+
+add_confy_test(confy
+    t-confy.cpp
+)
