@@ -25,6 +25,7 @@ namespace confy
 class option;
 class section;
 class schema_dsl;
+class config_event;
 
 class CONFY_API config
 {
@@ -80,6 +81,10 @@ public:
     // to contain only args which confy doesn't understand
     // they can be processed by additional configs or command line parsers
     void parse_cmd_line(int& argc, char* argv[]);
+
+    // option parsing results
+    bool has_parsing_errors() const;
+    const std::vector<config_event>& event_log() const;
 
     ///////////////////////////////////////////////////////////////////////////
     // low-level option parsing

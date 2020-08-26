@@ -365,6 +365,20 @@ void config::parse_cmd_line(int& argc, char* argv[])
     });
 }
 
+bool config::has_parsing_errors() const
+{
+    for(auto& e : m_config_events->events)
+    {
+        if (e.is_error()) return true;
+    }
+    return false;
+}
+
+const std::vector<config_event>& config::event_log() const
+{
+    return m_config_events->events;
+}
+
 section* config::parser_get_section(std::string_view name, bool is_abbr /*= false*/)
 {
     auto f = is_abbr ? by::abbr : by::name;
