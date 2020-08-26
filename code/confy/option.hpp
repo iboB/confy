@@ -46,7 +46,11 @@ public:
         same_source_value, // a value was provided from the same source
         bad_value, // the provided value was not compatible with the type
         bad_default, // default was requested but the option has a missing or incompatible default
-        bad_source, // the provided source is not allowed for this value (not returned by default try_set_value implementation)
+
+        // not returned by default try_set_value implementation
+        bad_source, // the provided source is not allowed for this value
+        abort_source, // stop parsing the current source
+        command_error, // error executing a command
     };
 
     // the default implementation will try to set the value from the given source

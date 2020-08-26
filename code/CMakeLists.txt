@@ -19,6 +19,8 @@ set(src
     confy/schema_dsl.cpp
     confy/value_source.hpp
 
+    confy/types/command.cpp
+
     confy/confy.hpp
 )
 
