@@ -9,7 +9,7 @@
 
 #include "option.hpp"
 #include "section.hpp"
-#include "config_error.hpp"
+#include "config_event.hpp"
 #include "exception.hpp"
 #include "schema_dsl.hpp"
 
@@ -50,18 +50,18 @@ inline std::ostream& operator<<(std::ostream& o, const option& opt)
 
 using ostr = std::ostringstream;
 
-class config::config_error_manager
+class config::config_event_manager
 {
 public:
-    config_error_manager()
+    config_event_manager()
     {
         m_sources_stack.reserve(2);
     }
 
-    bool has_errors() const { return !errors.empty(); }
-    void reset() { errors.clear(); }
+    // bool has_errors() const { return !errors.empty(); }
+    // void reset() { errors.clear(); }
 
-    std::vector<config_error> errors;
+    std::vector<config_event> events;
 
     std::vector<config::pushed_source> m_sources_stack;
 
@@ -75,9 +75,9 @@ public:
     }
 
     // error constructors
-    config_error& make_error()
+    config_event& make_error()
     {
-        auto& e = errors.emplace_back();
+        auto& e = events.emplace_back();
         if (!m_sources_stack.empty())
         {
             e.source = m_sources_stack.back().source;
@@ -89,34 +89,34 @@ public:
     void no_section(std::string_view name, bool is_abbr)
     {
         auto& e = make_error();
-        e.type = config_error::no_such_section;
+        e.type = config_event::no_such_section;
         e.section_name = name;
 
         ostr out;
         out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " section `" << name << "`. No option values will be set from it";
-        e.error_text = out.str();
+        e.text = out.str();
     }
 
     void no_option(std::string_view sec, std::string_view opt, bool is_abbr)
     {
         auto& e = make_error();
-        e.type = config_error::no_such_option;
+        e.type = config_event::no_such_option;
         e.section_name = sec;
         e.option_name = opt;
 
         ostr out;
         out << e.source_name << " refers to missing " << (is_abbr ? " abbreviated " : " ") << " option `" << sec << SECTION_DELIM << opt << "`.";
-        e.error_text = out.str();
+        e.text = out.str();
     }
 
     void source_error(std::string_view error)
     {
         auto& e = make_error();
-        e.type = config_error::bad_source;
+        e.type = config_event::bad_source;
 
         ostr out;
         out << "error in " << e.source_name << ": " << error;
-        e.error_text = out.str();
+        e.text = out.str();
     }
 
     void bad_set_value(const option& opt, std::string_view value, value_source source, option::set_value_result result)
@@ -133,23 +133,23 @@ public:
         switch (result)
         {
         case option::set_value_result::same_source_value:
-            e.type = config_error::same_source_value;
+            e.type = config_event::same_source_value;
             sout << "A different value was set with the same source priority.";
             break;
         case option::set_value_result::bad_value:
-            e.type = config_error::bad_value;
+            e.type = config_event::bad_value;
             sout << "The expected value format is ";
             opt.write_value_type_desc(sout);
             break;
         case option::set_value_result::bad_default:
-            e.type = config_error::bad_default;
+            e.type = config_event::bad_default;
             sout << "The requested default value ";
             opt.write_default_value(sout);
             sout << " was incompatible with the expected format: ";
             opt.write_value_type_desc(sout);
             break;
         case option::set_value_result::bad_source:
-            e.type = config_error::bad_source;
+            e.type = config_event::bad_source;
             sout << "The option doesn't accept the provided source.";
             break;
         default:
@@ -159,7 +159,7 @@ public:
         e.section_name = opt.m_section->name();
         e.option_name = opt.name();
         e.opt = &opt;
-        e.error_text = sout.str();
+        e.text = sout.str();
     }
 
     void no_value(const option& opt)
@@ -167,21 +167,21 @@ public:
         auto& e = make_error();
         e.source = value_source::default_val;
         e.source_name = "fallback to default value";
-        e.type = config_error::bad_default;
+        e.type = config_event::bad_default;
         e.section_name = opt.m_section->name();
         e.option_name = opt.name();
         e.opt = &opt;
 
         ostr out;
         out << "VALUE SET FAILED on " << opt;
-        e.error_text = out.str();
+        e.text = out.str();
     }
 };
 
 
 config::config(std::string_view name /*= {}*/)
     : m_name(name)
-    , m_config_errors(std::make_unique<config_error_manager>())
+    , m_config_events(std::make_unique<config_event_manager>())
 {
 }
 
@@ -364,7 +364,7 @@ section* config::parser_get_section(std::string_view name, bool is_abbr /*= fals
     auto sec = find(m_sections, f(name));
     if (sec == m_sections.end())
     {
-        m_config_errors->no_section(name, is_abbr);
+        m_config_events->no_section(name, is_abbr);
         return nullptr;
     }
     return sec->get();
@@ -376,11 +376,11 @@ void config::parser_set_option_value(section& sec, std::string_view name, std::s
     auto opt = find(sec.m_options, f(name));
     if (opt == sec.m_options.end())
     {
-        m_config_errors->no_option(sec.name(), name, is_abbr);
+        m_config_events->no_option(sec.name(), name, is_abbr);
         return;
     }
 
-    do_set_option_value(**opt, value, m_config_errors->m_sources_stack.back().source);
+    do_set_option_value(**opt, value, m_config_events->m_sources_stack.back().source);
 }
 
 void config::parser_set_option_value(std::string_view path, std::string_view value, bool is_abbr /*= false*/)
@@ -390,7 +390,7 @@ void config::parser_set_option_value(std::string_view path, std::string_view val
     auto sec = find(m_sections, f(split.section));
     if (sec == m_sections.end())
     {
-        m_config_errors->no_option(split.section, split.option, is_abbr);
+        m_config_events->no_option(split.section, split.option, is_abbr);
         return;
     }
     parser_set_option_value(**sec, split.option, value, is_abbr);
@@ -398,25 +398,25 @@ void config::parser_set_option_value(std::string_view path, std::string_view val
 
 void config::parser_add_source_error(std::string_view error)
 {
-    m_config_errors->source_error(error);
+    m_config_events->source_error(error);
 }
 
 void config::do_set_option_value(option& opt, std::string_view value, value_source source)
 {
     auto result = opt.try_set_value(value, source);
     if (result <= option::set_value_result::skipped) return;
-    m_config_errors->bad_set_value(opt, value, source, result);
+    m_config_events->bad_set_value(opt, value, source, result);
 }
 
 void config::push_source(pushed_source source)
 {
-    m_config_errors->push_source(source);
+    m_config_events->push_source(source);
 }
 
 void config::pop_source()
 {
-    m_config_errors->pop_source();
-    if (m_config_errors->m_sources_stack.empty())
+    m_config_events->pop_source();
+    if (m_config_events->m_sources_stack.empty())
     {
         update_options();
     }
@@ -444,7 +444,7 @@ void config::update_options()
                         }
                         else
                         {
-                            m_config_errors->bad_set_value(*opt, val, value_source::env_var, option::set_value_result::bad_value);
+                            m_config_events->bad_set_value(*opt, val, value_source::env_var, option::set_value_result::bad_value);
                         }
                     }
                 }
@@ -456,7 +456,7 @@ void config::update_options()
                 }
                 else
                 {
-                    m_config_errors->no_value(*opt);
+                    m_config_events->no_value(*opt);
                 }
             }
         }

@@ -30,14 +30,6 @@ public:
     const std::string& description() const { return m_description; }
     void set_description(std::string_view n) { m_description = n; }
 
-    // template <typename
-    // class dsl
-    // {
-    // public:
-
-    // private:
-    //     has_key& m_elem;
-    // };
 protected:
     std::string m_name;
     std::string m_abbr;

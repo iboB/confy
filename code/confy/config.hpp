@@ -25,7 +25,6 @@ namespace confy
 class option;
 class section;
 class schema_dsl;
-class config_error;
 
 class CONFY_API config
 {
@@ -143,9 +142,9 @@ private:
     void do_set_option_value(option& opt, std::string_view value, value_source source);
     void update_options();
 
-    // semi-pimpl hiding config error management
-    class config_error_manager;
-    std::unique_ptr<config_error_manager> m_config_errors;
+    // semi-pimpl hiding config event management
+    class config_event_manager;
+    std::unique_ptr<config_event_manager> m_config_events;
 };
 
 }

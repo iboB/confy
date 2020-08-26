@@ -13,10 +13,11 @@
 namespace confy
 {
 
-// config errors are not exceptions
+// config events are not exceptions
 // all errors will be collected into a vector and can be queried
-// potentially an app might want to continue working with config_errors
-class config_error
+// optionally if verbose is on all events are listed here
+// potentially an app might want to continue working with error
+class config_event
 {
 public:
     value_source source;
@@ -38,8 +39,8 @@ public:
     std::string provided_value; // what value was provided from the config
     const option* opt = nullptr; // if not null, will contain the option which was referred
 
-    // free-form text of the error
-    std::string error_text;
+    // optional free-form text of the event
+    std::string text;
 };
 
 }
