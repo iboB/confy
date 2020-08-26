@@ -5,6 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
+#pragma once
 #include "../option.hpp"
 
 #include <optional>

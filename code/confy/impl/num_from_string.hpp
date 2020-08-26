@@ -5,6 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
+#pragma once
 
 // a normal person would use charconv here
 // but gcc is stupid :(
