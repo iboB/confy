@@ -1,6 +1,6 @@
 # confy
 
-A C++17 configuration library which is:
+A C++17 application configuration library which is:
 
 * Easy to use
 * Configurable
@@ -24,7 +24,7 @@ A short example:
         role_t role = role_t::intern;
     };
 
-    ...
+    // ...
 
     app_configuration c;
 
