@@ -39,6 +39,7 @@ public:
     value_source source() const { return m_source; }
 
     section* sec() const { return m_section; }
+    config* cfg() const;
 
     using set_value_result = option_set_value_result;
 

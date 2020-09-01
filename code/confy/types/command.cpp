@@ -16,6 +16,7 @@ command::command(std::string_view name, std::string_view abbr, std::string_view 
     : option(name, abbr, desc)
 {
     m_no_env = true;
+    m_source = value_source::default_val;
 }
 
 command::~command() = default;

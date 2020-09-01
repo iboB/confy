@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include "option.hpp"
+#include "section.hpp"
 
 namespace confy
 {
@@ -42,6 +43,12 @@ option::set_value_result option::try_set_value(std::string_view val, value_sourc
     }
 
     return set_value_result::bad_value;
+}
+
+config* option::cfg() const
+{
+    if (!m_section) return nullptr;
+    return m_section->cfg();
 }
 
 }

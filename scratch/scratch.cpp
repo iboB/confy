@@ -36,6 +36,7 @@ int main()
             ;
 
         cfg.schema()
+            .cmd<confy::ini_file>()
             .opt(asd, "foo", "f", "bar badsa sad as sa")
             .opt(x, "zzz", "b", "enum type")
             .cmd<confy::string>("asd", "z")

@@ -20,6 +20,7 @@ set(src
     confy/value_source.hpp
 
     confy/types/command.cpp
+    confy/types/ini_file.cpp
 
     confy/confy.hpp
 )

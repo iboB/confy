@@ -33,6 +33,8 @@ public:
 
     const std::vector<std::unique_ptr<option>>& options() const { return m_options; }
 
+    config* cfg() const { return m_config; }
+
 private:
     friend class config;
     config* m_config = nullptr;

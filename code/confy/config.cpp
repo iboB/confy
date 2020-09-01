@@ -233,7 +233,7 @@ struct by
 
         ret.m_cmp = [](const key& a, const by& b) {
             return (a.name() == b.m_name)
-                || (a.abbr() == b.m_abbr);
+                || (!a.abbr().empty() && a.abbr() == b.m_abbr);
         };
         return ret;
     }

@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     configuration c;
 
     cfg.schema()
+        .cmd<confy::ini_file>()
         .opt(c.name, "name", "n", "The name of the person")
         .opt(c.age, "age", "a", "The age of the person")
         .opt(c.role, "role", "r", "The role of the person");

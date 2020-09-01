@@ -13,3 +13,4 @@
 #include "types/string.hpp"
 #include "types/auto_enum.hpp"
 #include "types/function.hpp"
+#include "types/ini_file.hpp"
