@@ -7,7 +7,7 @@
 //
 #pragma once
 
-#include "doctest.hpp"
+#include <doctest/doctest.h>
 
 #include <confy/value_source.hpp>
 #include <confy/option.hpp>

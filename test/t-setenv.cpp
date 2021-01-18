@@ -5,7 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "doctest.hpp"
+#include <doctest/doctest.h>
 #include "setenv.inl"
 
 #include <cstdlib>
