@@ -107,6 +107,7 @@ void configurator::configure() {
                 VERBOSE("Setting user override " << cur_section->desc().name << "." << kv.key() << " = " << kv.value());
                 (*value)->set_from_dict(kv.value());
                 (*value)->m_source = value_source::manual_override;
+                (*value)->validate();
                 if (auto ca = find_cli_arg_for_value(*cur_section, **value)) {
                     ca->used = true; // mark as used
                 }
@@ -129,6 +130,7 @@ void configurator::configure() {
                     << ca->key << (ca->abbr ? "(abbr)" : "") << " = " << ca->value);
                 value->set_from_string(ca->value);
                 value->m_source = value_source::cmd_line;
+                value->validate();
                 ca->used = true; // mark as used
                 continue;
             }
@@ -141,6 +143,7 @@ void configurator::configure() {
                         << *it);
                     value->set_from_dict(*it);
                     value->m_source = value_source::config_file;
+                    value->validate();
                     continue;
                 }
             }
@@ -185,6 +188,7 @@ void configurator::configure() {
                         << env_var_name << " = " << env_value);
                     value->set_from_string(env_value);
                     value->m_source = value_source::env_var;
+                    value->validate();
                     continue;
                 }
             }
@@ -193,6 +197,7 @@ void configurator::configure() {
             if (value->try_set_from_default()) {
                 VERBOSE("Setting " << sec->desc().name << "." << value->name() << " from default value");
                 value->m_source = value_source::default_val;
+                value->validate();
                 continue;
             }
 
