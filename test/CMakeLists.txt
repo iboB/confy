@@ -9,4 +9,5 @@ macro(confy_test test)
     add_doctest_lib_test(${test} confy t-${test}.cpp ${ARGN})
 endmacro()
 
+confy_test(setenv)
 confy_test(cli)

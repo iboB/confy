@@ -1,9 +1,5 @@
-// confy
-// Copyright (c) 2020-2021 Borislav Stanimirov
-//
-// Distributed under the MIT Software License
-// See accompanying file LICENSE.txt or copy at
-// https://opensource.org/licenses/MIT
+// Copyright (c) Borislav Stanimirov
+// SPDX-License-Identifier: MIT
 //
 #include <cstdlib>
 
@@ -13,12 +9,10 @@
 #include <vector>
 #include <string_view>
 
-namespace
-{
+namespace {
 std::vector<std::vector<char>> vars;
-void setenv(std::string_view name, std::string_view value, int)
-{
-    std::vector<char> new_var(name.length() + value.length() + 1 /*=*/ + 1 /*0*/);
+void setenv(std::string_view name, std::string_view value, int) {
+    std::vector<char> new_var(name.length() + value.length() + 1 /*=*/ + 1 /*\0*/);
     char* str = new_var.data();
     memcpy(str, name.data(), name.length());
     str += name.length();
@@ -30,15 +24,13 @@ void setenv(std::string_view name, std::string_view value, int)
     auto& v = vars.emplace_back(std::move(new_var));
     _putenv(v.data());
 }
-}
+} // namespace
 
 #endif
 
-namespace
-{
-void set_env_var(const char* name, const char* value)
-{
+namespace {
+void set_env_var(const char* name, const char* value) {
     setenv(name, value, 1);
 }
-}
+} // namespace
 

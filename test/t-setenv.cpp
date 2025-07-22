@@ -1,27 +1,18 @@
-// confy
-// Copyright (c) 2020-2021 Borislav Stanimirov
+// Copyright (c) Borislav Stanimirov
+// SPDX-License-Identifier: MIT
 //
-// Distributed under the MIT Software License
-// See accompanying file LICENSE.txt or copy at
-// https://opensource.org/licenses/MIT
-//
-#include <doctest/doctest.h>
 #include "setenv.inl"
-
+#include <doctest/doctest.h>
 #include <cstdlib>
 
-TEST_SUITE_BEGIN("setenv");
-
-TEST_CASE("get")
-{
+TEST_CASE("get") {
     auto p = std::getenv("PATH");
     CHECK(!!p);
     p = std::getenv("confy_surely_not");
     CHECK(!p);
 }
 
-TEST_CASE("set")
-{
+TEST_CASE("set") {
     set_env_var("confy_foo", "aaa");
     auto p = std::getenv("confy_foo");
     REQUIRE(p);
@@ -42,8 +33,7 @@ TEST_CASE("set")
     CHECK(v == "ggg");
 }
 
-TEST_CASE("set local")
-{
+TEST_CASE("set local") {
     std::string value = "hello world";
     {
         std::string name = "confy_some_name";
