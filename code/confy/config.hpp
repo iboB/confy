@@ -16,7 +16,7 @@ public:
 
     config(const config&) = delete;
     config& operator=(const config&) = delete;
-    config(config&&) noexcept = default;
+    config(config&&) noexcept;
     config& operator=(config&&) noexcept;
 
 public:

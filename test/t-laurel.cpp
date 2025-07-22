@@ -1,21 +1,14 @@
-// confy
-// Copyright (c) 2020-2021 Borislav Stanimirov
+// Copyright (c) Borislav Stanimirov
+// SPDX-License-Identifier: MIT
 //
-// Distributed under the MIT Software License
-// See accompanying file LICENSE.txt or copy at
-// https://opensource.org/licenses/MIT
-//
+#include <confy/bits/laurel.inl>
 #include <doctest/doctest.h>
-#include "impl/laurel.inl"
 
 #include <sstream>
 #include <vector>
 #include <string>
 
-TEST_SUITE_BEGIN("Laurel");
-
-struct tester_entry
-{
+struct tester_entry {
     enum etype { sec, key, err };
     etype type;
 
@@ -28,36 +21,30 @@ struct tester_entry
     tester_entry(laurel_error error , int eline) : type(err), str(laurel_error_to_text(error)), err_line(eline) {}
 };
 
-struct tester
-{
+struct tester {
     tester(std::vector<tester_entry> e) : entries(std::move(e)) {}
-    ~tester()
-    {
+    ~tester() {
         CHECK(counter == entries.size());
     }
 
-    const tester_entry& next() const
-    {
+    const tester_entry& next() const {
         return entries[counter++];
     }
 
-    void operator()(std::string_view sname) const
-    {
+    void operator()(std::string_view sname) const {
         auto& e = next();
         CHECK(e.type == tester_entry::sec);
         CHECK(e.str == sname);
     }
 
-    void operator()(std::string_view kname, std::string_view kval) const
-    {
+    void operator()(std::string_view kname, std::string_view kval) const {
         auto& e = next();
         CHECK(e.type == tester_entry::key);
         CHECK(e.str == kname);
         CHECK(e.key_value == kval);
     }
 
-    void operator()(laurel_error error, int eline) const
-    {
+    void operator()(laurel_error error, int eline) const {
         auto& e = next();
         CHECK(e.type == tester_entry::err);
         CHECK(e.str == laurel_error_to_text(error));
@@ -68,8 +55,7 @@ struct tester
     std::vector<tester_entry> entries;
 };
 
-TEST_CASE("test parse")
-{
+TEST_CASE("test parse") {
     const char* ini = R"ini(
         ; inside comment
 val1=55
@@ -84,16 +70,14 @@ sp ace=va lue
     laurel(sini, t, t, t);
 }
 
-TEST_CASE("test error =")
-{
+TEST_CASE("test error =") {
     const char* ini = "val2asd";
     tester t({ {laurel_error::missing_eq, 1} });
     std::istringstream sini(ini);
     laurel(sini, t, t, t);
 }
 
-TEST_CASE("test error ]")
-{
+TEST_CASE("test error ]") {
     const char* ini = "a=5  \n;comment\n[ss";
     tester t({ {"a", "5"}, {laurel_error::missing_cb, 3} });
     std::istringstream sini(ini);

@@ -10,4 +10,5 @@ macro(confy_test test)
 endmacro()
 
 confy_test(setenv)
+confy_test(laurel)
 confy_test(cli)
