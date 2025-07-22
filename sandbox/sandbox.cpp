@@ -25,8 +25,17 @@ struct my_config {
     }
 };
 
-int main() {
+int main() try {
     uint16_t port = 0;
     confy::integer<uint16_t> cport(port);
+    cport.set_from_string("xxs");
     return 0;
+}
+catch (std::exception& e) {
+    cerr << "Exception: " << e.what() << endl;
+    return 1;
+}
+catch (...) {
+    cerr << "Unknown exception" << endl;
+    return 1;
 }

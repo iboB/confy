@@ -4,7 +4,7 @@
 #pragma once
 #include "common_value.hpp"
 #include "../dict.hpp"
-#include "../bits/throw_ex.hpp"
+#include "../bits/value_ex.hpp"
 #include <concepts>
 #include <charconv>
 
@@ -23,8 +23,7 @@ public:
         auto end = str.data() + str.size();
         auto res = std::from_chars(str.data(), end, this->m_val);
         if (res.ec != std::errc() || res.ptr != end) {
-            throw_ex{} << this->m_name << ": failed to parse "
-                << sizeof(Int) * 8 << "-bit integer value from '" << str << "'";
+            value_ex{this} << "failed to parse " << sizeof(Int) * 8 << "-bit integer from '" << str << "'";
         }
     }
 
@@ -32,5 +31,10 @@ public:
         this->m_val = d.get<Int>();
     }
 };
+
+template <std::integral Int>
+std::unique_ptr<integer<Int>> make_value(Int& val) {
+    return std::make_unique<integer<Int>>(val);
+}
 
 } // namespace confy

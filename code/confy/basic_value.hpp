@@ -10,6 +10,8 @@
 
 namespace confy {
 
+class section;
+
 class CONFY_API basic_value {
 public:
     virtual ~basic_value() noexcept;
@@ -21,12 +23,17 @@ public:
         none,         // no environment variable
     };
 
+    const section* sec() const noexcept { return m_section; }
+    const std::string& name() const noexcept { return m_name; }
+
     virtual std::string to_string() const noexcept = 0;
 
 protected:
     friend class section;
     template <typename Value, typename Crtp>
     friend class basic_value_dsl;
+
+    const section* m_section = nullptr;
 
     std::string m_name;
     std::string m_desc;

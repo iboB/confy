@@ -3,7 +3,7 @@
 //
 #include "basic_value.hpp"
 #include "dict.hpp"
-#include "bits/throw_ex.hpp"
+#include "bits/value_ex.hpp"
 
 namespace confy {
 
@@ -14,7 +14,7 @@ bool basic_value::try_set_from_default() noexcept { return false; }
 void basic_value::set_from_dict(const dict& d) {
     // try to set if the dict is a string
     if (d.type() != dict::value_t::string) {
-        throw_ex{} << "can't set value '" << m_name << "' from dict of type " << d.type_name();
+        value_ex{this} << "can't set value as string from dict of type " << d.type_name();
     }
 
     set_from_string(d.get<std::string_view>());

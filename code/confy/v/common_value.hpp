@@ -19,6 +19,8 @@ public:
     common_value(T& val) : m_val(val) {}
 
     struct dsl_type : public basic_value_dsl<common_value, dsl_type> {
+        using basic_value_dsl<common_value, dsl_type>::basic_value_dsl;
+
         dsl_type& default_val(T&& val) {
             this->value.m_default_val = std::forward<T>(val);
             return *this;
