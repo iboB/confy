@@ -25,12 +25,15 @@ public:
 
 protected:
     friend class section;
+    template <typename Value, typename Crtp>
+    friend class basic_value_dsl;
 
     std::string m_name;
     std::string m_desc;
     std::string m_abbr;
     std::string m_env_var;
     env_var_type m_env_var_type = env_var_type::automatic;
+    bool required = false; // whether this value is required or optional
 
     value_source m_source = value_source::none; // source from which the value was set
 
@@ -46,6 +49,10 @@ protected:
     // throw an exception if the value is not valid
     // the default implementation does nothing
     virtual void validate() const;
+
+    // return a human readable string description of the value validation
+    // the default implementation returns an empty string
+    virtual std::string get_validation_desc() const noexcept;
 };
 
 } // namespace confy

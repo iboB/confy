@@ -22,4 +22,6 @@ void basic_value::set_from_dict(const dict& d) {
 
 void basic_value::validate() const {}
 
+std::string basic_value::get_validation_desc() const noexcept { return {}; }
+
 } // namespace confy
