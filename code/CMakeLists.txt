@@ -24,15 +24,17 @@ target_sources(confy
 
         confy/basic_value.hpp
         confy/section.hpp
+        confy/config.hpp
 
         confy/cli.hpp
-        confy/config.hpp
+        confy/configurator.hpp
     PRIVATE
         confy/exception.cpp
 
         confy/basic_value.cpp
         confy/section.cpp
+        confy/config.cpp
 
         confy/cli.cpp
-        confy/config.cpp
+        confy/configurator.cpp
 )

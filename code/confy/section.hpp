@@ -35,6 +35,7 @@ public:
     void add_value(std::unique_ptr<basic_value> value);
 
 private:
+    friend class configurator;
     description m_desc;
     std::vector<std::unique_ptr<basic_value>> m_values;
 };
