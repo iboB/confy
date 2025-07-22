@@ -23,6 +23,7 @@ public:
     virtual std::string to_string() const noexcept = 0;
 
 protected:
+    friend class configurator;
     friend class section;
     template <typename Value, typename Crtp>
     friend class basic_value_dsl;

@@ -19,7 +19,7 @@ public:
         std::string abbr;
         std::string desc;
         std::string env_var_prefix;
-        env_var_strategy env_var;
+        env_var_strategy env_var = env_var_strategy::automatic;
     };
 
     const description& desc() const { return m_desc; }

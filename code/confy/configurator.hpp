@@ -6,12 +6,15 @@
 #include "cli.hpp"
 #include "dict.hpp"
 #include "section.hpp"
+#include <functional>
 #include <string>
+#include <iosfwd>
 #include <string_view>
 
 namespace confy {
 
 class config;
+class basic_value;
 
 class CONFY_API configurator {
 public:
@@ -21,12 +24,17 @@ public:
     configurator(const configurator&) = delete;
     configurator& operator=(const configurator&) = delete;
 
+    using verbose_log_func = std::function<void(std::string msg)>;
+    void set_verbose_log_function(verbose_log_func func) {
+        m_verbose_log_func = std::move(func);
+    }
+
     // only parse command line and don't touch config values
     void parse_command_line(int& argc, char* argv[]);
 
     void parse_ini_file(std::istream& in, std::string_view filename = {});
 
-    void parse_json_file(std::string_view filename);
+    void parse_json_file(std::istream& in, std::string_view filename = {});
 
     void add_user_overrides(dict overrides);
 
@@ -51,6 +59,8 @@ public:
 private:
     std::string m_name; // name of config (for logging/debugging only)
 
+    verbose_log_func m_verbose_log_func; // function to log verbose messages
+
     std::string m_cli_prefix; // prefix for command line options
 
     std::string m_env_var_prefix; // prefix for environment variables
@@ -61,6 +71,8 @@ private:
         bool used = false;
     };
     std::vector<cli_arg> m_cli_values;
+    cli_arg* find_cli_arg_for_value(section& sec, basic_value& val);
+
     dict m_config_file_values;
     dict m_user_overrides;
 
