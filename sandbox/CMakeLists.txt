@@ -1,9 +1,5 @@
-# confy
-# Copyright (c) 2020-2021 Borislav Stanimirov
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
 #
-# Distributed under the MIT Software License
-# See accompanying file LICENSE.txt or copy at
-# https://opensource.org/licenses/MIT
-#
-add_executable(scratch scratch.cpp)
-target_link_libraries(scratch confy)
+add_executable(sandbox sandbox.cpp)
+# target_link_libraries(sandbox confy)

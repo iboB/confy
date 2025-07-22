@@ -1,10 +1,5 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include <iostream>
-
-using namespace std;
-
-int main() {
-    return 0;
-}
+#pragma once
+#include "api.h"
