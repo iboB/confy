@@ -19,9 +19,20 @@ target_link_libraries(confy PUBLIC
 target_sources(confy
     INTERFACE FILE_SET HEADERS FILES
         confy/api.h
+
+        confy/exception.hpp
+
+        confy/basic_value.hpp
+        confy/section.hpp
+
         confy/cli.hpp
         confy/config.hpp
     PRIVATE
+        confy/exception.cpp
+
+        confy/basic_value.cpp
+        confy/section.cpp
+
         confy/cli.cpp
         confy/config.cpp
 )

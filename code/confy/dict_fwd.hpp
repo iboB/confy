@@ -1,13 +1,8 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#pragma once
-#include "api.h"
+#include <nlohmann/json_fwd.hpp>
 
 namespace confy {
-
-class CONFY_API config {
-public:
-};
-
+using dict = nlohmann::ordered_json;
 } // namespace confy

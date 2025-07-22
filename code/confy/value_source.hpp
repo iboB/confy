@@ -12,7 +12,7 @@ enum class value_source {
     env_var, // was read from an environment variable
     config_file, // was read from a configuration file which was loaded at some point
     cmd_line, // explicitly set via a command line arg
-    manual_override, // manually overrided by the user
+    manual_override, // manually overridden by the user
 };
 
 } // namespace confy
