@@ -5,6 +5,7 @@
 #include "api.h"
 #include "dict_fwd.hpp"
 #include "value_source.hpp"
+#include "env_var_strategy.hpp"
 #include <string>
 #include <string_view>
 
@@ -16,14 +17,7 @@ class CONFY_API basic_value {
 public:
     virtual ~basic_value() noexcept;
 
-    enum class env_var_type {
-        automatic,    // automatically generated from name, section, and config
-        manual,       // manually set by the user, section and config prefixes apply
-        manual_global,// manually set by the user, section and config prefixes ignored
-        none,         // no environment variable
-    };
-
-    const section* sec() const noexcept { return m_section; }
+    const section* owner() const noexcept { return m_section; }
     const std::string& name() const noexcept { return m_name; }
 
     virtual std::string to_string() const noexcept = 0;
@@ -39,7 +33,7 @@ protected:
     std::string m_desc;
     std::string m_abbr;
     std::string m_env_var;
-    env_var_type m_env_var_type = env_var_type::automatic;
+    env_var_strategy m_env_var_strategy = env_var_strategy::automatic;
     bool required = false; // whether this value is required or optional
 
     value_source m_source = value_source::none; // source from which the value was set

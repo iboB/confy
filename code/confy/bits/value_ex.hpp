@@ -8,7 +8,7 @@
 namespace confy {
 struct value_ex : public throw_ex {
     value_ex(const basic_value& v) {
-        if (auto sec = v.sec()) {
+        if (auto sec = v.owner()) {
             *this << sec->desc().name << ".";
         }
         *this << v.name() << ": ";

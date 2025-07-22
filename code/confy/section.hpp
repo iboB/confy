@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "api.h"
+#include "env_var_strategy.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -18,6 +19,7 @@ public:
         std::string abbr;
         std::string desc;
         std::string env_var_prefix;
+        env_var_strategy env_var;
     };
 
     const description& desc() const { return m_desc; }

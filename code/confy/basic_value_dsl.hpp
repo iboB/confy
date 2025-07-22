@@ -30,18 +30,18 @@ public:
 
     Crtp& env_var(std::string_view e) {
         value.m_env_var = std::string(e);
-        value.m_env_var_type = Value::env_var_type::manual;
+        value.m_env_var_strategy = Value::env_var_strategy::manual;
         return self();
     }
 
     Crtp& env_var_global(std::string_view e) {
         value.m_env_var = std::string(e);
-        value.m_env_var_type = Value::env_var_type::manual_global;
+        value.m_env_var_strategy = Value::env_var_strategy::manual_global;
         return self();
     }
 
     Crtp& no_env_var() {
-        value.m_env_var_type = Value::env_var_type::none;
+        value.m_env_var_strategy = Value::env_var_strategy::none;
         return self();
     }
 
