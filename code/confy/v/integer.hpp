@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "common_value.hpp"
+#include "common_ref_value.hpp"
 #include "../dict.hpp"
 #include "../bits/value_ex.hpp"
 #include <concepts>
@@ -11,9 +11,9 @@
 namespace confy {
 
 template <std::integral Int>
-class integer : public common_value<Int> {
+class integer : public common_ref_value<Int> {
 public:
-    using common_value<Int>::common_value;
+    using common_ref_value<Int>::common_ref_value;
 
     std::string to_string() const noexcept {
         return std::to_string(this->m_val);

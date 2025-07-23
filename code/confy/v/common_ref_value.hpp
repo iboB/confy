@@ -12,17 +12,18 @@
 namespace confy {
 
 template <typename T>
-class common_value : public basic_value {
+class common_ref_value : public basic_value {
 public:
     using value_type = T;
 
-    common_value(T& val) : m_val(val) {}
+    common_ref_value(T& val) : m_val(val) {}
 
-    struct dsl_type : public basic_value_dsl<common_value, dsl_type> {
-        using basic_value_dsl<common_value, dsl_type>::basic_value_dsl;
+    struct dsl_type : public basic_value_dsl<common_ref_value, dsl_type> {
+        using basic_value_dsl<common_ref_value, dsl_type>::basic_value_dsl;
 
-        dsl_type& default_val(T&& val) {
-            this->value.m_default_val = std::forward<T>(val);
+        template <typename U>
+        dsl_type& default_val(U&& val) {
+            this->value.m_default_val = std::forward<U>(val);
             return *this;
         }
 
