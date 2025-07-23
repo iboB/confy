@@ -33,6 +33,12 @@ public:
             this->value.m_validators.push_back(std::move(validator));
             return *this;
         }
+
+        dsl_type& validate(typename func_validator<T>::func_type func, std::string desc = {}) {
+            auto validator = std::make_unique<func_validator<T>>(std::move(func), std::move(desc));
+            this->value.m_validators.push_back(std::move(validator));
+            return *this;
+        }
     };
 
     virtual bool try_set_from_default() noexcept override final {
