@@ -12,3 +12,5 @@ endmacro()
 confy_test(setenv)
 confy_test(laurel)
 confy_test(cli)
+
+confy_test(configurator)

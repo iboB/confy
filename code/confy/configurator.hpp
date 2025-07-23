@@ -24,6 +24,10 @@ public:
     configurator(const configurator&) = delete;
     configurator& operator=(const configurator&) = delete;
 
+    void set_env_var_prefix(std::string_view prefix) {
+        m_env_var_prefix = std::string(prefix);
+    }
+
     using verbose_log_func = std::function<void(std::string msg)>;
     void set_verbose_log_function(verbose_log_func func) {
         m_verbose_log_func = std::move(func);
@@ -36,7 +40,7 @@ public:
 
     void parse_json_file(std::istream& in, std::string_view filename = {});
 
-    void add_user_overrides(dict overrides);
+    void add_manual_overrides(dict overrides);
 
     enum command_result {
         continue_exec, // continue execution (e.g. normal operation)
@@ -56,6 +60,17 @@ public:
 
     config get_config();
 
+    // this following functions is are public for mostly for debugging purposes
+    // there is no point in calling them manually
+
+    // resolve env var names in values
+    void _resolve_env_var_names();
+
+    struct cli_arg : public cli::parsed_argument {
+        bool used = false;
+    };
+    cli_arg* _find_cli_arg_for_value(basic_value& val);
+
 private:
     std::string m_name; // name of config (for logging/debugging only)
 
@@ -67,14 +82,10 @@ private:
     bool m_no_env = false; // disable environment variables
 
     // value store
-    struct cli_arg : public cli::parsed_argument {
-        bool used = false;
-    };
     std::vector<cli_arg> m_cli_values;
-    cli_arg* find_cli_arg_for_value(section& sec, basic_value& val);
 
     dict m_config_file_values;
-    dict m_user_overrides;
+    dict m_manual_overrides;
 
     bool m_configure_done = false;
 

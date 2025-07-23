@@ -4,7 +4,7 @@
 #include "configurator.hpp"
 #include "basic_value.hpp"
 #include "config.hpp"
-#include "bits/throw_ex.hpp"
+#include "bits/value_ex.hpp"
 #include <itlib/qalgorithm.hpp>
 #include <fstream>
 #include <sstream>
@@ -21,6 +21,15 @@
 
 namespace confy {
 
+std::ostream& operator<<(std::ostream& out, const basic_value& bv) {
+    auto sec = bv.owner();
+    if (sec) {
+        out << sec->desc().name << '.';
+    }
+    out << bv.name();
+    return out;
+}
+
 configurator::configurator(std::string_view name)
     : m_name(name)
 {
@@ -31,24 +40,24 @@ configurator::configurator(std::string_view name)
 configurator::~configurator() = default;
 
 void configurator::parse_command_line(int& argc, char* argv[]) {
-    VERBOSE("Parsing command line arguments");
+    VERBOSE(m_name << ": parsing command line");
     for (auto arg : cli::filter_cmd_line(argc, argv, m_cli_prefix)) {
-        VERBOSE(arg.key << (arg.abbr ? "(abbr)" : "") << " = " << arg.value);
+        VERBOSE("  " << arg.key << (arg.abbr ? "(abbr)" : "") << " = " << arg.value);
         m_cli_values.push_back({arg});
     }
 }
 
 void configurator::parse_ini_file(std::istream& in, std::string_view filename) {
-    VERBOSE("Parsing config file: " << filename);
+    VERBOSE(m_name << ": parsing ini config file: " << filename);
 
     dict* cur_dict = &m_config_file_values;
     auto on_section = [&](std::string_view name) {
         cur_dict = &m_config_file_values[name];
-        VERBOSE("section " << name);
+        VERBOSE("  section " << name);
     };
     auto on_key = [&](std::string_view key, std::string_view value) {
         (*cur_dict)[key] = value;
-        VERBOSE(key << " = " << value);
+        VERBOSE("     " << key << " = " << value);
     };
     auto on_error = [&](laurel_error error, int line) {
         throw_ex{} << filename << ":" << line << " " << laurel_error_to_text(error);
@@ -57,14 +66,19 @@ void configurator::parse_ini_file(std::istream& in, std::string_view filename) {
 }
 
 void configurator::parse_json_file(std::istream& in, std::string_view filename) {
-    VERBOSE("Parsing JSON config file: " << filename);
-    auto json = dict::parse(in);
-    VERBOSE(json.dump(2));
-    m_config_file_values.merge_patch(json);
+    try {
+        VERBOSE(m_name << ": parsing json config file: " << filename);
+        auto json = dict::parse(in);
+        VERBOSE(json.dump(2));
+        m_config_file_values.merge_patch(json);
+    }
+    catch (std::exception& ex) {
+        throw_ex{} << filename << ": " << ex.what();
+    }
 }
 
-void configurator::add_user_overrides(dict overrides) {
-    VERBOSE("Adding user overrides\n" << overrides.dump(2));
+void configurator::add_manual_overrides(dict overrides) {
+    VERBOSE(m_name << ": setting manual overrides: " << overrides);
     m_config_file_values.merge_patch(overrides);
 }
 
@@ -84,32 +98,33 @@ struct by_name {
 }
 
 void configurator::configure() {
-    VERBOSE("Configuring");
+    VERBOSE(m_name << ": setting config values");
+    _resolve_env_var_names();
 
-    // first go through user overrides
-    // it's an error to have an user override for non-existent values
+    // first go through manual overrides
+    // it's an error to have an manual override for non-existent values
     {
         section* cur_section = &get_default_section();
-        for (auto& kv : m_user_overrides.items()) {
+        for (auto& kv : m_manual_overrides.items()) {
             auto* value = itlib::pfind_if(cur_section->m_values, by_name{kv.key()});
             if (!value) {
                 if (cur_section != &get_default_section()) {
-                    throw_ex{} << "User override for non-existent value: " << cur_section->desc().name << "." << kv.key();
+                    throw_ex{} << "manual override for non-existing value: " << cur_section->desc().name << "." << kv.key();
                 }
                 else if (auto* sec = find_section(kv.key())) {
                     cur_section = sec;
                 }
                 else {
-                    throw_ex{} << "User override for non-existent section or value: " << kv.key();
+                    throw_ex{} << "manual override for non-existing section of value value: " << kv.key();
                 }
             }
             else {
-                VERBOSE("Setting user override " << cur_section->desc().name << "." << kv.key() << " = " << kv.value());
+                VERBOSE(*value << ": setting manual override from '" << kv.value() << "'");
                 (*value)->set_from_dict(kv.value());
                 (*value)->m_source = value_source::manual_override;
                 (*value)->validate();
-                if (auto ca = find_cli_arg_for_value(*cur_section, **value)) {
-                    ca->used = true; // mark as used
+                if (auto ca = _find_cli_arg_for_value(**value)) {
+                    ca->used = true; // mark as used so as not report it as unused later
                 }
             }
         }
@@ -117,16 +132,25 @@ void configurator::configure() {
 
     // now go through the sections and search for values in the store
     for (auto& sec : m_sections) {
-        auto sec_dict = m_config_file_values.find(sec->desc().name);
+        dict* sec_cfg_file_dict = nullptr;
+        if (sec.get() == &get_default_section()) {
+            sec_cfg_file_dict = &m_config_file_values;
+        }
+        else {
+            if (auto f = m_config_file_values.find(sec->desc().name); f != m_config_file_values.end()) {
+                sec_cfg_file_dict = &*f;
+            }
+        }
+
         for (auto& value : sec->m_values) {
             if (value->m_source == value_source::manual_override) {
-                // already set by user override
+                // already set by manual override
                 continue;
             }
 
             // look through the command line arguments
-            if (auto ca = find_cli_arg_for_value(*sec, *value)) {
-                VERBOSE("Setting " << sec->desc().name << "." << value->name() << " from cli arg: "
+            if (auto ca = _find_cli_arg_for_value(*value)) {
+                VERBOSE(*value << ": setting from cli arg: "
                     << ca->key << (ca->abbr ? "(abbr)" : "") << " = " << ca->value);
                 value->set_from_string(ca->value);
                 value->m_source = value_source::cmd_line;
@@ -136,12 +160,16 @@ void configurator::configure() {
             }
 
             // look in the config file values
-            if (sec_dict != m_config_file_values.end()) {
-                auto it = sec_dict->find(value->name());
-                if (it != sec_dict->end()) {
-                    VERBOSE("Setting " << sec->desc().name << "." << value->name() << " from config file store: "
-                        << *it);
-                    value->set_from_dict(*it);
+            if (sec_cfg_file_dict) {
+                auto it = sec_cfg_file_dict->find(value->name());
+                if (it != sec_cfg_file_dict->end()) {
+                    VERBOSE(*value << ": setting from config file store value: " << *it);
+                    if (it->type() != dict::value_t::string) {
+                        value->set_from_string(it->get<std::string_view>());
+                    }
+                    else {
+                        value->set_from_dict(*it);
+                    }
                     value->m_source = value_source::config_file;
                     value->validate();
                     continue;
@@ -149,53 +177,24 @@ void configurator::configure() {
             }
 
             // look in the environment variables
-            if (!m_no_env
-                && sec->desc().env_var != env_var_strategy::none
-                && value->m_env_var_strategy != env_var_strategy::none
-            ) {
-                std::string env_var_name;
-                if (value->m_env_var_strategy == env_var_strategy::manual_global) {
-                    env_var_name = value->m_env_var;
-                }
-                else {
-                    if (sec->desc().env_var == env_var_strategy::manual_global) {
-                        env_var_name = value->m_env_var;
-                    }
-                    else {
-                        env_var_name = m_env_var_prefix;
-                        if (sec->desc().env_var != env_var_strategy::manual) {
-                            env_var_name += sec->desc().env_var_prefix;
-                        }
-                        else {
-                            assert(sec->desc().env_var == env_var_strategy::automatic);
-                            env_var_name += sec->desc().name + '_';
-                        }
-                    }
-
-                    if (value->m_env_var_strategy != env_var_strategy::manual) {
-                        env_var_name += value->m_env_var;
-                    }
-                    else {
-                        assert(value->m_env_var_strategy == env_var_strategy::automatic);
-                        env_var_name += value->name();
-                    }
-                }
-
-                VERBOSE("Looking for environment variable: " << env_var_name);
-                auto env_value = std::getenv(env_var_name.c_str());
+            if (!value->m_env_var.empty()) {
+                auto env_value = std::getenv(value->m_env_var.c_str());
                 if (env_value) {
-                    VERBOSE("Setting " << sec->desc().name << "." << value->name() << " from environment variable: "
-                        << env_var_name << " = " << env_value);
+                    VERBOSE(*value << ": setting from environment variable: "
+                        << value->m_env_var << " = " << env_value);
                     value->set_from_string(env_value);
                     value->m_source = value_source::env_var;
                     value->validate();
                     continue;
                 }
+                else {
+                    VERBOSE("Env var " << value->m_env_var << " for " << *value << " is not set")
+                }
             }
 
             // try default value
             if (value->try_set_from_default()) {
-                VERBOSE("Setting " << sec->desc().name << "." << value->name() << " from default value");
+                VERBOSE(*value << ": setting from default value");
                 value->m_source = value_source::default_val;
                 value->validate();
                 continue;
@@ -204,11 +203,11 @@ void configurator::configure() {
 
             // unset value, check if it's required
             if (value->required) {
-                throw_ex{} << "Required value is not set: " << sec->desc().name << "." << value->name();
+                value_ex{*value} << "required value not set";
             }
 
 
-            VERBOSE("No value set for " << sec->desc().name << "." << value->name());
+            VERBOSE(*value << ": not set");
         }
     }
 
@@ -239,23 +238,27 @@ section* configurator::find_section(std::string_view name) const noexcept {
     return it->get();
 }
 
-configurator::cli_arg* configurator::find_cli_arg_for_value(section& sec, basic_value& val) {
+configurator::cli_arg* configurator::_find_cli_arg_for_value(basic_value& val) {
+    auto* sec = val.owner();
+    assert(sec);
+
     for (auto& arg : m_cli_values) {
         std::string_view name = arg.key;
 
         auto [qsec, qval] = [&] {
             if (arg.abbr) {
-                return std::make_pair(sec.desc().abbr, name);
+                return std::make_pair(sec->desc().abbr, name);
             }
             else {
-                return std::make_pair(sec.desc().name, name);
+                return std::make_pair(sec->desc().name, name);
             }
         }();
 
         if (!name.starts_with(qsec)) continue;
         name.remove_prefix(qsec.size());
-        if (!name.starts_with(cli::KEY_DELIM)) continue;
-        name.remove_prefix(1);
+        if (name.starts_with(cli::KEY_DELIM)) {
+            name.remove_prefix(1);
+        }
         if (name == val.name()) {
             return &arg;
         }
@@ -271,6 +274,51 @@ config configurator::get_config() {
     cfg.m_name = m_name;
     cfg.m_sections = std::move(m_sections);
     return cfg;
+}
+
+void configurator::_resolve_env_var_names() {
+    for (auto& sec : m_sections) {
+        for (auto& value : sec->m_values) {
+            if (m_no_env
+                || sec->desc().env_var_strat != env_var_strategy::none
+                || value->m_env_var_strategy != env_var_strategy::none
+            ) {
+                // env vars are blocked
+                value->m_env_var.clear();
+                continue;
+            }
+
+            if (value->m_env_var_strategy == env_var_strategy::manual_global) {
+                // keep original
+                continue;
+            }
+
+            std::string env_var_name;
+            if (sec->desc().env_var_strat == env_var_strategy::manual_global) {
+                env_var_name = sec->desc().env_var_prefix;
+            }
+            else {
+                env_var_name = m_env_var_prefix;
+                if (sec->desc().env_var_strat != env_var_strategy::manual) {
+                    env_var_name += sec->desc().env_var_prefix;
+                }
+                else {
+                    assert(sec->desc().env_var_strat == env_var_strategy::automatic);
+                    env_var_name += sec->desc().name + '_';
+                }
+            }
+
+            if (value->m_env_var_strategy != env_var_strategy::manual) {
+                env_var_name += value->m_env_var;
+            }
+            else {
+                assert(value->m_env_var_strategy == env_var_strategy::automatic);
+                env_var_name += value->name();
+            }
+
+            value->m_env_var = std::move(env_var_name);
+        }
+    }
 }
 
 } // namespace confy
