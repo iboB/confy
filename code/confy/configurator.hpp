@@ -60,7 +60,7 @@ public:
 
     config get_config();
 
-    // this following functions is are public for mostly for debugging purposes
+    // this following functions is are public for mostly for testing and debugging purposes
     // there is no point in calling them manually
 
     // resolve env var names in values

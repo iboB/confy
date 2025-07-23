@@ -214,7 +214,7 @@ void configurator::configure() {
     // check for unused command line arguments
     for (auto& ca : m_cli_values) {
         if (!ca.used) {
-            throw_ex {} << "Command line argument not used: "
+            throw_ex{} << "Command line argument not used: "
                 << ca.key << (ca.abbr ? " (abbr)" : "") << " = " << ca.value;
         }
     }
