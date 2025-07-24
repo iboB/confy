@@ -40,11 +40,52 @@ public:
     // throw an exception if the node is not valid
     virtual void validate() const = 0;
 
-protected:
-    friend class configurator;
-    template <typename Node, typename Crtp>
-    friend class node_dsl;
+    template <typename Node>
+    class tdsl {
+    public:
+        using NodeDsl = typename Node::dsl;
 
+        Node& m_node;
+
+        tdsl(Node& node) : m_node(node) {}
+
+        NodeDsl& name(std::string_view n) {
+            m_node.m_name = std::string(n);
+            return self();
+        }
+
+        NodeDsl& desc(std::string_view d) {
+            m_node.m_desc = std::string(d);
+            return self();
+        }
+
+        NodeDsl& abbr(std::string_view a) {
+            m_node.m_abbr = std::string(a);
+            return self();
+        }
+
+        NodeDsl& env_var(std::string_view e) {
+            m_node.m_env_var.str = std::string(e);
+            m_node.m_env_var.strategy = env::var_strategy::manual;
+            return self();
+        }
+
+        NodeDsl& env_var_global(std::string_view e) {
+            m_node.m_env_var.str = std::string(e);
+            m_node.m_env_var.strategy = env::var_strategy::manual_global;
+            return self();
+        }
+
+        NodeDsl& no_env_var() {
+            m_node.m_env_var.strategy = env::var_strategy::none;
+            return self();
+        }
+
+    protected:
+        NodeDsl& self() { return static_cast<NodeDsl&>(*this); }
+    };
+
+protected:
     const node* m_owner = nullptr;
 
     std::string m_name;

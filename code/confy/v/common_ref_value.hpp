@@ -3,70 +3,52 @@
 //
 #pragma once
 #include "validator.hpp"
-#include "../basic_value.hpp"
-#include "../basic_value_dsl.hpp"
-#include <optional>
+#include "../value.hpp"
 #include <memory>
 #include <vector>
 
 namespace confy {
 
 template <typename T>
-class common_ref_value : public basic_value {
+class common_ref_value : public value {
 public:
     using value_type = T;
 
-    common_ref_value(T& val) : m_val(val) {}
+    common_ref_value(T& ref) : m_ref(ref) {}
 
-    struct dsl_type : public basic_value_dsl<common_ref_value, dsl_type> {
-        using basic_value_dsl<common_ref_value, dsl_type>::basic_value_dsl;
+    struct dsl : public value::tdsl<common_ref_value> {
+        using value::tdsl<common_ref_value>::tdsl;
 
         template <typename U>
-        dsl_type& default_val(U&& val) {
-            this->value.m_default_val = std::forward<U>(val);
+        dsl& default_val(U&& val) {
+            this->m_node.m_ref = std::forward<U>(val);
+            this->m_node.m_source = value_source::default_val;
             return *this;
         }
 
         template <template <typename> class Validator, typename... Args>
-        dsl_type& validate(Args&&... args) {
+        dsl& validate(Args&&... args) {
             auto validator = std::make_unique<Validator<T>>(std::forward<Args>(args)...);
-            this->value.m_validators.push_back(std::move(validator));
+            this->value.m_refidators.push_back(std::move(validator));
             return *this;
         }
 
-        dsl_type& validate(typename func_validator<T>::func_type func, std::string desc = {}) {
+        dsl& validate(typename func_validator<T>::func_type func, std::string desc = {}) {
             auto validator = std::make_unique<func_validator<T>>(std::move(func), std::move(desc));
-            this->value.m_validators.push_back(std::move(validator));
+            this->value.m_refidators.push_back(std::move(validator));
             return *this;
         }
     };
 
-    virtual bool try_set_from_default() noexcept override final {
-        if (!m_default_val) return false;
-        m_val = std::move(*m_default_val);
-        m_source = value_source::default_val;
-        return true;
-    }
-
-    virtual void validate() const override {
-        for (auto& v : m_validators) {
-            v->validate(m_val);
-        }
-    }
-
-    virtual std::string get_validation_desc() const noexcept override {
-        std::string desc;
-        for (const auto& v : m_validators) {
-            if (!desc.empty()) desc += "\n";
-            desc += v->get_desc();
-        }
-        return desc;
-    }
-
 protected:
-    T& m_val;
-    std::optional<T> m_default_val;
-    std::vector<std::unique_ptr<validator<T>>> m_validators;
+    void validate_value() const override {
+        for (auto& v : m_refidators) {
+            v->validate(m_ref);
+        }
+    }
+
+    T& m_ref;
+    std::vector<std::unique_ptr<validator<T>>> m_refidators;
 };
 
 } // namespace confy

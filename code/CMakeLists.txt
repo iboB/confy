@@ -29,7 +29,7 @@ target_sources(confy
         confy/value.hpp
 
         confy/cli.hpp
-         confy/configurator.hpp
+        confy/configurator.hpp
     PRIVATE
         confy/exception.cpp
 

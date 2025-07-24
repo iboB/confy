@@ -19,7 +19,7 @@ void value::set_from_dict(const dict& d, value_source src) {
 
 void value::validate() const {
     if (m_source == value_source::none) {
-        if (required) {
+        if (m_required) {
             throw_ex{} << get_path() << ": value is required but not set";
         }
         // nothing to validate

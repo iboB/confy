@@ -4,35 +4,35 @@
 #pragma once
 #include "common_ref_value.hpp"
 #include "../dict.hpp"
-#include "../bits/value_ex.hpp"
+#include "../bits/throw_ex.hpp"
 #include <concepts>
 #include <charconv>
 
 namespace confy {
 
 template <std::integral Int>
-class integer : public common_ref_value<Int> {
+class integer final : public common_ref_value<Int> {
 public:
     using common_ref_value<Int>::common_ref_value;
 
-    std::string to_string() const noexcept {
-        return std::to_string(this->m_val);
+    std::string to_string() const noexcept override {
+        return std::to_string(this->m_ref);
     }
 
-    dict to_dict() const noexcept {
-        return {this->m_val};
+    dict to_dict() const noexcept override {
+        return {this->m_ref};
     }
 
-    virtual void set_from_string(std::string_view str) override {
+    virtual void set_value_from_string(std::string_view str) override {
         auto end = str.data() + str.size();
-        auto res = std::from_chars(str.data(), end, this->m_val);
+        auto res = std::from_chars(str.data(), end, this->m_ref);
         if (res.ec != std::errc() || res.ptr != end) {
-            value_ex{this} << "failed to parse " << sizeof(Int) * 8 << "-bit integer from '" << str << "'";
+            throw_ex{} << this->get_path() << ": failed to parse " << sizeof(Int) * 8 << "-bit integer from '" << str << "'";
         }
     }
 
-    virtual void set_from_dict(const dict& d) override {
-        this->m_val = d.get<Int>();
+    virtual void set_value_from_dict(const dict& d) override {
+        this->m_ref = d.get<Int>();
     }
 };
 

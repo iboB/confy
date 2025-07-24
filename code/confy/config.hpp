@@ -7,7 +7,6 @@
 
 namespace confy {
 
-
 class CONFY_API config {
 public:
     ~config();

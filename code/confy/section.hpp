@@ -18,18 +18,23 @@ public:
     section(section&&) noexcept = default;
     section& operator=(section&&) noexcept = default;
 
-    virtual std::string to_string() const noexcept override;
+    struct dsl : public node::tdsl<section> {
+        using node::tdsl<section>::tdsl;
+    };
+
     virtual dict to_dict() const noexcept override;
 
     virtual node* get_child(std::string_view path) const noexcept override;
     virtual node* get_abbr_child(std::string_view path) const noexcept override;
 
-    virtual void set_from_string(std::string_view str, value_source src) override;
     virtual void set_from_dict(const dict& d, value_source src) override;
 
     virtual void validate() const override;
 
 private:
+    virtual std::string to_string() const noexcept override;
+    virtual void set_from_string(std::string_view str, value_source src) override;
+
     itlib::flat_map<std::string, std::unique_ptr<node>> m_children;
 };
 
