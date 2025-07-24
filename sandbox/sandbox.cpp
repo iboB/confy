@@ -28,7 +28,7 @@ struct my_config {
 
 int main() try {
     uint16_t port = 0;
-    confy::integer_ref<uint16_t> cport(port);
+    confy::common_value<uint16_t&> cport(port);
     cport.set_from_string("xxs", confy::value_source::manual_override);
     return 0;
 }

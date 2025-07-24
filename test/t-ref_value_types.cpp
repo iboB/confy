@@ -1,3 +1,6 @@
+// Copyright (c) Borislav Stanimirov
+// SPDX-License-Identifier: MIT
+//
 #include <confy/v/std_string.hpp>
 #include <confy/v/integer.hpp>
 #include <doctest/doctest.h>
@@ -125,7 +128,7 @@ TEST_CASE("integer") {
     ref_test(-34, 56);
     ref_test(43u, 336u);
 
-    using ref_type = confy::integer_ref<int>;
+    using ref_type = confy::common_value<int&>;
 
     // validate
     {

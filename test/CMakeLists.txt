@@ -15,6 +15,8 @@ confy_test(cli)
 
 confy_test(section)
 confy_test(ref_value_types)
+confy_test(simple_value)
+confy_test(optional)
 confy_test(node_tree)
 
 # confy_test(configurator)

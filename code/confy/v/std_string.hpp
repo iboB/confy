@@ -2,39 +2,39 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "common_ref_value.hpp"
-#include "simple_value.hpp"
-#include "../dict.hpp"
-#include "../bits/throw_ex.hpp"
+#include "common_value.hpp"
+#include "../ref_value_for.hpp"
 
 namespace confy {
 
-class std_string_ref final : public common_ref_value<std::string> {
-public:
-    using common_ref_value<std::string>::common_ref_value;
+template <>
+struct common_value_type_traits<std::string> {
+    using value_type = std::string;
+    using ref_type = std::string&;
+    using const_ref_type = const std::string&;
 
-    std::string to_string() const noexcept override {
-        return m_ref;
+    static const std::string& to_string(const std::string& val) noexcept {
+        return val;
     }
 
-    dict to_dict() const noexcept override {
-        return m_ref;
+    static dict to_dict(const std::string& val) noexcept {
+        return val;
     }
 
-    virtual void set_value_from_string(std::string_view str) override {
-        m_ref = std::string(str);
+    static void set_value_from_string(std::string& val, std::string_view str) {
+        val = std::string(str);
     }
 
-    virtual void set_value_from_dict(const dict& d) override {
-        m_ref = d.get<std::string>();
+    static void set_value_from_dict(std::string& val, const dict& d) {
+        val = d.get<std::string>();
     }
 };
+
+using std_string = common_value<std::string>;
 
 template <>
 struct ref_value_for<std::string> {
-    using type = std_string_ref;
+    using type = common_value<std::string&>;
 };
-
-using std_string = simple_value<std::string>;
 
 }
