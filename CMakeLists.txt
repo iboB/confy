@@ -27,6 +27,11 @@ set(ICM_DEV_CXX_STANDARD 20)
 
 include(icm_dev_mode)
 
+if(ICM_DEV_MODE AND NOT MSVC)
+    # this is a retarded warning
+    add_compile_options(-Wno-missing-field-initializers)
+endif()
+
 #######################################
 # options
 
