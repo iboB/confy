@@ -21,7 +21,9 @@ public:
     }
 
     dict to_dict() const noexcept override {
-        return {this->m_ref};
+        dict ret;
+        ret = dict::number_integer_t(this->m_ref);
+        return ret;
     }
 
     virtual void set_value_from_string(std::string_view str) override {

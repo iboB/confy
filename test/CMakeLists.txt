@@ -14,6 +14,7 @@ confy_test(laurel)
 confy_test(cli)
 
 confy_test(section)
+confy_test(ref_value_types)
 confy_test(node_tree)
 
 # confy_test(configurator)

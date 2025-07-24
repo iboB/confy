@@ -11,11 +11,19 @@ class CONFY_API value : public node {
 public:
     using node::node;
 
+    value_source source() const noexcept { return m_source; }
+    bool required() const noexcept { return m_required; }
+
     template <typename Node>
     struct tdsl : public node::tdsl<Node> {
         using NodeDsl = typename Node::dsl;
 
         using node::tdsl<Node>::tdsl;
+
+        NodeDsl& optional() {
+            this->m_node.m_required = false;
+            return this->self();
+        }
 
         NodeDsl& required() {
             this->m_node.m_required = true;
@@ -39,7 +47,7 @@ protected:
     virtual void set_value_from_string(std::string_view str) = 0;
     virtual void validate_value() const = 0;
 
-    bool m_required = false; // whether this value is required or optional
+    bool m_required = true; // whether this value is required or optional
     value_source m_source = value_source::none; // source from which the value was set
 
 private:

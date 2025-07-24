@@ -25,6 +25,13 @@ public:
         : common_ref_value(ref, {}, nullptr)
     {}
 
+    const T& val() const noexcept { return m_ref; }
+    void set_value(const T& val, const value_source src = value_source::manual_override) {
+        if (src < m_source) return;
+        m_ref = val;
+        m_source = src;
+    }
+
     struct dsl : public value::tdsl<common_ref_value> {
         using value::tdsl<common_ref_value>::tdsl;
 

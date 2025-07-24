@@ -10,11 +10,13 @@ namespace confy {
 void value::set_from_string(std::string_view str, value_source src) {
     if (src < m_source) return;
     set_value_from_string(str);
+    m_source = src;
 }
 
 void value::set_from_dict(const dict& d, value_source src) {
     if (src < m_source) return;
     set_value_from_dict(d);
+    m_source = src;
 }
 
 void value::validate() const {
@@ -35,8 +37,15 @@ void value::try_set_from_env_var() {
 
     auto env_value = std::getenv(env_var_name.c_str());
     if (env_value) {
-        set_value_from_string(env_value);
-        m_source = value_source::env_var;
+        try {
+            set_value_from_string(env_value);
+            m_source = value_source::env_var;
+        }
+        catch (confy::exception& e) {
+            std::string msg = e.what();
+            msg += " from env_var '" + env_var_name + "'";
+            throw confy::exception(msg);
+        }
     }
 }
 

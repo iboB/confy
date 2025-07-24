@@ -21,9 +21,6 @@ public:
     explicit simple_value(T& ref)
         : simple_value({}, nullptr)
     {}
-
-    const T& value() const noexcept { return m_val; }
-    T& value() noexcept { return m_val; }
 };
 
 } // namespace confy
