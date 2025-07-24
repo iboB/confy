@@ -29,8 +29,9 @@ public:
     }
 };
 
-inline std::unique_ptr<std_string> make_confy_value_from_ref(std::string& ref, node_desc desc, node* owner) {
-    return std::make_unique<std_string>(ref, std::move(desc), owner);
-}
+template <>
+struct ref_value_for<std::string> {
+    using type = std_string;
+};
 
 }

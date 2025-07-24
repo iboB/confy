@@ -19,6 +19,11 @@ public:
     {}
     virtual ~node() noexcept;
 
+    node(const node&) = delete;
+    node& operator=(const node&) = delete;
+    node(node&&) noexcept = delete;
+    node& operator=(node&&) noexcept = delete;
+
     const node* owner() const noexcept { return m_owner; }
 
     const std::string& name() const noexcept { return m_desc.name; }

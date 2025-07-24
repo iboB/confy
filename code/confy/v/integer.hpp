@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "common_ref_value.hpp"
+#include "simple_value.hpp"
 #include "../dict.hpp"
 #include "../bits/throw_ex.hpp"
 #include <concepts>
@@ -11,7 +12,7 @@
 namespace confy {
 
 template <std::integral Int>
-class integer final : public common_ref_value<Int> {
+class integer_ref final : public common_ref_value<Int> {
 public:
     using common_ref_value<Int>::common_ref_value;
 
@@ -37,8 +38,11 @@ public:
 };
 
 template <std::integral Int>
-std::unique_ptr<integer<Int>> make_confy_value_from_ref(Int& ref, node_desc desc, node* owner) {
-    return std::make_unique<integer<Int>>(ref, std::move(desc), owner);
-}
+struct ref_value_for<Int> {
+    using type = integer_ref<Int>;
+};
+
+template <std::integral Int>
+using integer = simple_value<Int>;
 
 } // namespace confy

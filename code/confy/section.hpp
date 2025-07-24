@@ -4,6 +4,7 @@
 #pragma once
 #include "api.h"
 #include "node.hpp"
+#include "ref_value_for.hpp"
 #include <memory>
 #include <itlib/flat_map.hpp>
 
@@ -13,11 +14,6 @@ class CONFY_API section final : public node {
 public:
     using node::node;
     ~section();
-
-    section(const section&) = delete;
-    section& operator=(const section&) = delete;
-    section(section&&) noexcept = default;
-    section& operator=(section&&) noexcept = default;
 
     struct dsl : public node::tdsl<section> {
         using node::tdsl<section>::tdsl;
@@ -50,7 +46,7 @@ public:
 
     template <typename T>
     auto add_value(T& ref, node_desc desc) {
-        auto val = make_confy_value_from_ref(ref, std::move(desc), this);
+        auto val = std::make_unique<ref_value_for_t<T>>(ref, std::move(desc), this);
         auto ret = val.get();
         try_add_child(std::move(val));
         return typename decltype(val)::element_type::dsl(*ret);

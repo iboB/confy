@@ -4,6 +4,7 @@
 #pragma once
 #include "validator.hpp"
 #include "../value.hpp"
+#include "../ref_value_for.hpp"
 #include <memory>
 #include <vector>
 
@@ -37,26 +38,26 @@ public:
         template <template <typename> class Validator, typename... Args>
         dsl& validate(Args&&... args) {
             auto validator = std::make_unique<Validator<T>>(std::forward<Args>(args)...);
-            this->m_node.m_refidators.push_back(std::move(validator));
+            this->m_node.m_validators.push_back(std::move(validator));
             return *this;
         }
 
         dsl& validate(typename func_validator<T>::func_type func, std::string desc = {}) {
             auto validator = std::make_unique<func_validator<T>>(std::move(func), std::move(desc));
-            this->m_node.m_refidators.push_back(std::move(validator));
+            this->m_node.m_validators.push_back(std::move(validator));
             return *this;
         }
     };
 
 protected:
     void validate_value() const override {
-        for (auto& v : m_refidators) {
+        for (auto& v : m_validators) {
             v->validate(m_ref);
         }
     }
 
     T& m_ref;
-    std::vector<std::unique_ptr<validator<T>>> m_refidators;
+    std::vector<std::unique_ptr<validator<T>>> m_validators;
 };
 
 } // namespace confy

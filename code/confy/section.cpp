@@ -15,7 +15,7 @@ std::string section::to_string() const noexcept {
     return {};
 }
 dict section::to_dict() const noexcept {
-    dict d;
+    auto d = dict::object();
     for (const auto& [name, child] : m_children) {
         d[name] = child->to_dict();
     }
