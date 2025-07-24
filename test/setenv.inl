@@ -24,13 +24,22 @@ void setenv(std::string_view name, std::string_view value, int) {
     auto& v = vars.emplace_back(std::move(new_var));
     _putenv(v.data());
 }
+
+void unsetenv(std::string_view name) {
+    setenv(name, "", 1);
+}
 } // namespace
 
 #endif
 
 namespace {
 void set_env_var(const char* name, const char* value) {
-    setenv(name, value, 1);
+    if (value) {
+        setenv(name, value, 1);
+    }
+    else {
+        unsetenv(name);
+    }
 }
 } // namespace
 

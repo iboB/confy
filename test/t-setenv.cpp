@@ -31,6 +31,10 @@ TEST_CASE("set") {
     REQUIRE(p);
     v = p;
     CHECK(v == "ggg");
+
+    set_env_var("confy_foo", nullptr);
+    p = std::getenv("confy_foo");
+    CHECK(!p);
 }
 
 TEST_CASE("set local") {
