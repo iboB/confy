@@ -3,12 +3,10 @@
 //
 #pragma once
 #include "api.h"
-#include <string>
-#include <vector>
-#include <memory>
+#include "dict.hpp"
 
 namespace confy {
-class section;
+
 
 class CONFY_API config {
 public:
@@ -25,7 +23,7 @@ public:
 
     std::string m_name;
 
-    std::vector<std::unique_ptr<section>> m_sections; // sections in this config
+    dict m_dict;
 };
 
 } // namespace confy

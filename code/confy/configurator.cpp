@@ -271,8 +271,6 @@ config configurator::get_config() {
         throw_ex{} << "Configuration is not done yet. Call configure() first.";
     }
     config cfg;
-    cfg.m_name = m_name;
-    cfg.m_sections = std::move(m_sections);
     return cfg;
 }
 
