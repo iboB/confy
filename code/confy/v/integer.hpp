@@ -19,6 +19,10 @@ public:
         return std::to_string(this->m_val);
     }
 
+    dict to_dict() const noexcept {
+        return {this->m_val};
+    }
+
     virtual void set_from_string(std::string_view str) override {
         auto end = str.data() + str.size();
         auto res = std::from_chars(str.data(), end, this->m_val);

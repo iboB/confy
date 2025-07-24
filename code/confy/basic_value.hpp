@@ -5,7 +5,7 @@
 #include "api.h"
 #include "dict_fwd.hpp"
 #include "value_source.hpp"
-#include "env_var_strategy.hpp"
+#include "env.hpp"
 #include <string>
 #include <string_view>
 
@@ -19,25 +19,11 @@ public:
 
     const section* owner() const noexcept { return m_section; }
     const std::string& name() const noexcept { return m_name; }
+    const std::string& desc() const noexcept { return m_desc; }
+    const std::string& abbr() const noexcept { return m_abbr; }
 
     virtual std::string to_string() const noexcept = 0;
-
-protected:
-    friend class configurator;
-    friend class section;
-    template <typename Value, typename Crtp>
-    friend class basic_value_dsl;
-
-    const section* m_section = nullptr;
-
-    std::string m_name;
-    std::string m_desc;
-    std::string m_abbr;
-    std::string m_env_var;
-    env_var_strategy m_env_var_strategy = env_var_strategy::automatic;
-    bool required = false; // whether this value is required or optional
-
-    value_source m_source = value_source::none; // source from which the value was set
+    virtual dict to_dict() const noexcept = 0;
 
     virtual void set_from_string(std::string_view str) = 0;
 
@@ -55,6 +41,22 @@ protected:
     // return a human readable string description of the value validation
     // the default implementation returns an empty string
     virtual std::string get_validation_desc() const noexcept;
+
+protected:
+    friend class configurator;
+    friend class section;
+    template <typename Value, typename Crtp>
+    friend class basic_value_dsl;
+
+    const section* m_section = nullptr;
+
+    std::string m_name;
+    std::string m_desc;
+    std::string m_abbr;
+    env::var m_env_var;
+    bool required = false; // whether this value is required or optional
+
+    value_source m_source = value_source::none; // source from which the value was set
 };
 
 } // namespace confy
