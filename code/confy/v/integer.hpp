@@ -37,8 +37,8 @@ public:
 };
 
 template <std::integral Int>
-std::unique_ptr<integer<Int>> make_value(Int& val) {
-    return std::make_unique<integer<Int>>(val);
+std::unique_ptr<integer<Int>> make_confy_value_from_ref(Int& ref, node_desc desc, node* owner) {
+    return std::make_unique<integer<Int>>(ref, std::move(desc), owner);
 }
 
 } // namespace confy

@@ -3,6 +3,7 @@
 //
 #include <confy/config.hpp>
 #include <confy/v/integer.hpp>
+#include <confy/v/std_string.hpp>
 
 #include <iostream>
 #include <cstdint>

@@ -83,10 +83,24 @@ void section::set_from_dict(const dict& d, value_source src) {
     }
 }
 
+void section::try_set_from_env_var() {
+    for (const auto& c : m_children) {
+        c.second->try_set_from_env_var();
+    }
+}
+
 void section::validate() const {
     for (const auto& c : m_children) {
         c.second->validate();
     }
+}
+
+void section::try_add_child(std::unique_ptr<node> child) {
+    auto name = child->name();
+    if (m_children.count(name)) {
+        throw_ex{} << get_path() << ": child with name '" << name << "' already exists";
+    }
+    m_children[name] = std::move(child);
 }
 
 } // namespace confy

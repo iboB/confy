@@ -13,20 +13,20 @@ std::string node::get_path() const noexcept {
     if (m_owner) {
         auto n = m_owner->get_path();
         if (!n.empty()) {
-            return n + '.' + m_name;
+            return n + '.' + name();
         }
     }
-    return m_name;
+    return name();
 }
 
 std::string node::get_abbr_path() const noexcept {
     if (m_owner) {
         auto n = m_owner->get_abbr_path();
         if (!n.empty()) {
-            return n + '.' + m_abbr;
+            return n + '.' + abbr();
         }
     }
-    return m_abbr;
+    return abbr();
 }
 
 namespace {

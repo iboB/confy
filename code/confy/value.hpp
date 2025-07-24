@@ -9,6 +9,8 @@ namespace confy {
 
 class CONFY_API value : public node {
 public:
+    using node::node;
+
     template <typename Node>
     struct tdsl : public node::tdsl<Node> {
         using NodeDsl = typename Node::dsl;

@@ -3,24 +3,28 @@
 //
 #pragma once
 #include "api.h"
+#include "node_desc.hpp"
 #include "dict_fwd.hpp"
 #include "value_source.hpp"
 #include "env.hpp"
-#include <string>
 #include <string_view>
 
 namespace confy {
 
 class CONFY_API node {
 public:
+    explicit node(node_desc desc, node* owner)
+        : m_desc(std::move(desc))
+        , m_owner(owner)
+    {}
     virtual ~node() noexcept;
 
     const node* owner() const noexcept { return m_owner; }
 
-    const std::string& name() const noexcept { return m_name; }
-    const std::string& desc() const noexcept { return m_desc; }
-    const std::string& abbr() const noexcept { return m_abbr; }
-    const env::var& env_var_data() const noexcept { return m_env_var; }
+    const std::string& name() const noexcept { return m_desc.name; }
+    const std::string& desc() const noexcept { return m_desc.description; }
+    const std::string& abbr() const noexcept { return m_desc.abbr; }
+    const env::var& env_var_data() const noexcept { return m_desc.env_var; }
 
     std::string get_path() const noexcept;
     std::string get_abbr_path() const noexcept;
@@ -45,53 +49,52 @@ public:
     public:
         using NodeDsl = typename Node::dsl;
 
-        Node& m_node;
-
         tdsl(Node& node) : m_node(node) {}
 
         NodeDsl& name(std::string_view n) {
-            m_node.m_name = std::string(n);
+            m_node.m_desc.name = std::string(n);
             return self();
         }
 
         NodeDsl& desc(std::string_view d) {
-            m_node.m_desc = std::string(d);
+            m_node.m_desc.description = std::string(d);
             return self();
         }
 
         NodeDsl& abbr(std::string_view a) {
-            m_node.m_abbr = std::string(a);
+            m_node.m_desc.abbr = std::string(a);
             return self();
         }
 
         NodeDsl& env_var(std::string_view e) {
-            m_node.m_env_var.str = std::string(e);
-            m_node.m_env_var.strategy = env::var_strategy::manual;
+            m_node.m_desc.env_var.str = std::string(e);
+            m_node.m_desc.env_var.strategy = env::var_strategy::manual;
             return self();
         }
 
         NodeDsl& env_var_global(std::string_view e) {
-            m_node.m_env_var.str = std::string(e);
-            m_node.m_env_var.strategy = env::var_strategy::manual_global;
+            m_node.m_desc.env_var.str = std::string(e);
+            m_node.m_desc.env_var.strategy = env::var_strategy::manual_global;
             return self();
         }
 
         NodeDsl& no_env_var() {
-            m_node.m_env_var.strategy = env::var_strategy::none;
+            m_node.m_desc.env_var.strategy = env::var_strategy::none;
             return self();
         }
 
+        Node& val() {
+            return m_node;
+        }
+
     protected:
+        Node& m_node;
         NodeDsl& self() { return static_cast<NodeDsl&>(*this); }
     };
 
 protected:
+    node_desc m_desc;
     const node* m_owner = nullptr;
-
-    std::string m_name;
-    std::string m_desc;
-    std::string m_abbr;
-    env::var m_env_var;
 };
 
 } // namespace confy

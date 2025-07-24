@@ -14,7 +14,15 @@ class common_ref_value : public value {
 public:
     using value_type = T;
 
-    common_ref_value(T& ref) : m_ref(ref) {}
+    common_ref_value(T& ref, node_desc desc, node* owner)
+        : value(std::move(desc), owner)
+        , m_ref(ref)
+    {}
+
+    // this constructor is used for testing
+    explicit common_ref_value(T& ref)
+        : common_ref_value(ref, {}, nullptr)
+    {}
 
     struct dsl : public value::tdsl<common_ref_value> {
         using value::tdsl<common_ref_value>::tdsl;
@@ -29,13 +37,13 @@ public:
         template <template <typename> class Validator, typename... Args>
         dsl& validate(Args&&... args) {
             auto validator = std::make_unique<Validator<T>>(std::forward<Args>(args)...);
-            this->value.m_refidators.push_back(std::move(validator));
+            this->m_node.m_refidators.push_back(std::move(validator));
             return *this;
         }
 
         dsl& validate(typename func_validator<T>::func_type func, std::string desc = {}) {
             auto validator = std::make_unique<func_validator<T>>(std::move(func), std::move(desc));
-            this->value.m_refidators.push_back(std::move(validator));
+            this->m_node.m_refidators.push_back(std::move(validator));
             return *this;
         }
     };
