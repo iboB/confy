@@ -3,50 +3,51 @@
 //
 #pragma once
 #include <string_view>
+#include "env.hpp"
 
 namespace confy {
 
-template <typename Value, typename Crtp> // C++23 replace crtp with deducing this
-class basic_value_dsl {
+template <typename Node, typename Crtp> // C++23 replace crtp with deducing this
+class basic_node_dsl {
 public:
-    Value& value;
+    Node& m_node;
 
-    basic_value_dsl(Value& value) : value(value) {}
+    basic_node_dsl(Node& node) : m_node(node) {}
 
     Crtp& name(std::string_view n) {
-        value.m_name = std::string(n);
+        m_node.m_name = std::string(n);
         return self();
     }
 
     Crtp& desc(std::string_view d) {
-        value.m_desc = std::string(d);
+        m_node.m_desc = std::string(d);
         return self();
     }
 
     Crtp& abbr(std::string_view a) {
-        value.m_abbr = std::string(a);
+        m_node.m_abbr = std::string(a);
         return self();
     }
 
     Crtp& env_var(std::string_view e) {
-        value.m_env_var = std::string(e);
-        value.m_env_var_strategy = Value::env_var_strategy::manual;
+        m_node.m_env_var.str = std::string(e);
+        m_node.m_env_var.strategy = env::var_strategy::manual;
         return self();
     }
 
     Crtp& env_var_global(std::string_view e) {
-        value.m_env_var = std::string(e);
-        value.m_env_var_strategy = Value::env_var_strategy::manual_global;
+        m_node.m_env_var.str = std::string(e);
+        m_node.m_env_var.strategy = env::var_strategy::manual_global;
         return self();
     }
 
     Crtp& no_env_var() {
-        value.m_env_var_strategy = Value::env_var_strategy::none;
+        m_node.m_env_var.strategy = env::var_strategy::none;
         return self();
     }
 
     Crtp& required() {
-        value.required = true;
+        m_node.required = true;
         return self();
     }
 

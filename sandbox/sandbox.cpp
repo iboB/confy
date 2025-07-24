@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <confy/config.hpp>
-#include <confy/v/integer.hpp>
+// #include <confy/v/integer.hpp>
 
 #include <iostream>
 #include <cstdint>
@@ -26,9 +26,9 @@ struct my_config {
 };
 
 int main() try {
-    uint16_t port = 0;
-    confy::integer<uint16_t> cport(port);
-    cport.set_from_string("xxs");
+    //uint16_t port = 0;
+    //confy::integer<uint16_t> cport(port);
+    //cport.set_from_string("xxs");
     return 0;
 }
 catch (std::exception& e) {

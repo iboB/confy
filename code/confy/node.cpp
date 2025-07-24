@@ -1,10 +1,10 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include "section.hpp"
+#include "node.hpp"
 
 namespace confy {
 
-section::~section() = default;
+node::~node() noexcept = default;
 
 } // namespace confy

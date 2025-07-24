@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 //
 #include "config.hpp"
-#include "section.hpp"
-#include "basic_value.hpp"
 
 namespace confy {
 

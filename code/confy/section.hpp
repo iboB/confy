@@ -3,27 +3,14 @@
 //
 #pragma once
 #include "api.h"
-#include "env.hpp"
-#include <string>
+#include "node.hpp"
 #include <memory>
-#include <vector>
+#include <itlib/flat_map.hpp>
 
 namespace confy {
 
-class basic_value;
-
-class CONFY_API section {
+class CONFY_API section final : public node {
 public:
-    struct description {
-        std::string name;
-        std::string abbr;
-        std::string desc;
-        env::var env_var; // prefix
-    };
-
-    const description& desc() const { return m_desc; }
-
-    section(description d);
     ~section();
 
     section(const section&) = delete;
@@ -31,12 +18,10 @@ public:
     section(section&&) noexcept = default;
     section& operator=(section&&) noexcept = default;
 
-    void add_value(std::unique_ptr<basic_value> value);
+    //void add_value(std::unique_ptr<basic_value> value);
 
 private:
-    friend class configurator;
-    description m_desc;
-    std::vector<std::unique_ptr<basic_value>> m_values;
+    itlib::flat_map<std::string, std::unique_ptr<node>> m_children;
 };
 
 } // namespace confy
