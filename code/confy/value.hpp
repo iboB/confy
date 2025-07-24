@@ -7,6 +7,8 @@
 
 namespace confy {
 
+class exception;
+
 class CONFY_API value : public node {
 public:
     using node::node;
@@ -51,6 +53,8 @@ protected:
     value_source m_source = value_source::none; // source from which the value was set
 
 private:
+    [[noreturn]] void rethrow(const confy::exception& ex) const;
+
     virtual node* get_child(std::string_view) const noexcept final override {
         return nullptr;
     }

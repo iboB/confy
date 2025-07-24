@@ -19,21 +19,21 @@ public:
     using ref_type = typename traits::ref_type;
     using const_ref_type = typename traits::const_ref_type;
 
-    common_value(T val, node_desc desc, node* owner)
+    common_value(T val, node_desc desc, node* owner) noexcept
         : value(std::move(desc), owner)
         , m_val(val)
     {}
 
     // this constructor is used for testing
-    explicit common_value(T ref)
+    explicit common_value(T ref) noexcept
         : common_value(ref, {}, nullptr)
     {}
 
-    common_value(node_desc desc, node* owner)
+    common_value(node_desc desc, node* owner) noexcept
         : value(std::move(desc), owner)
     {}
 
-    common_value()
+    common_value() noexcept
         : common_value({}, nullptr)
     {}
 

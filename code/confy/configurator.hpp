@@ -29,7 +29,7 @@ public:
     configurator(const configurator&) = delete;
     configurator& operator=(const configurator&) = delete;
 
-    void parse_command_line(int& argc, char* argv[]);
+    void parse_cmd_line(int& argc, char* argv[]);
     void parse_ini_file(std::istream& in, std::string_view filename = {});
     void parse_json_file(std::istream& in, std::string_view filename = {});
 

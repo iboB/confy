@@ -21,7 +21,7 @@ configurator::configurator(desc d)
 
 configurator::~configurator() = default;
 
-void configurator::parse_command_line(int& argc, char* argv[]) {
+void configurator::parse_cmd_line(int& argc, char* argv[]) {
     for (auto& arg : cli::filter_cmd_line(argc, argv, m_desc.cli_prefix)) {
         node* child;
         if (arg.abbr) {

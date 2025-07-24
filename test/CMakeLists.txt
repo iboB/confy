@@ -13,10 +13,12 @@ confy_test(setenv)
 confy_test(laurel)
 confy_test(cli)
 
-confy_test(section)
+confy_test(value_type_traits)
 confy_test(ref_value_types)
-confy_test(simple_value)
-confy_test(optional)
+confy_test(value_types)
+confy_test(std_optional)
+
+confy_test(section)
 confy_test(node_tree)
 
-# confy_test(configurator)
+confy_test(configurator)

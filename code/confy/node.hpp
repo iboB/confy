@@ -13,7 +13,7 @@ namespace confy {
 
 class CONFY_API node {
 public:
-    explicit node(node_desc desc, node* owner)
+    explicit node(node_desc desc, node* owner) noexcept
         : m_desc(std::move(desc))
         , m_owner(owner)
     {}
