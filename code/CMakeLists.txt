@@ -40,5 +40,5 @@ target_sources(confy
         confy/value.cpp
 
         confy/cli.cpp
-        # confy/configurator.cpp
+        confy/configurator.cpp
 )

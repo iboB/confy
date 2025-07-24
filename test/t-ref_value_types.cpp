@@ -5,6 +5,19 @@
 #include "setenv.inl"
 
 template <typename T>
+std::string to_string(const T& val) {
+    return std::to_string(val);
+}
+
+const std::string& to_string(const std::string& val) {
+    return val;
+}
+
+const std::string to_string(bool b) {
+    return b ? "true" : "false";
+}
+
+template <typename T>
 void ref_test(T val_a, T val_b) {
     using value_type = T;
     using ref_type = confy::ref_value_for_t<value_type>;
@@ -56,8 +69,8 @@ void ref_test(T val_a, T val_b) {
     {
         value_type val = {};
         ref_type ref(val);
-        auto str_a = std::to_string(val_a);
-        auto str_b = std::to_string(val_b);
+        auto str_a = to_string(val_a);
+        auto str_b = to_string(val_b);
         ref.set_from_string(str_a, confy::value_source::cmd_line);
         CHECK(val == val_a);
         ref.set_from_string(str_b, confy::value_source::default_val);
@@ -99,7 +112,7 @@ void ref_test(T val_a, T val_b) {
         ref.try_set_from_env_var();
         CHECK(ref.source() == confy::value_source::none);
 
-        auto str_a = std::to_string(val_a);
+        auto str_a = to_string(val_a);
         set_env_var(env_var_name.c_str(), str_a.c_str());
         ref.try_set_from_env_var();
         CHECK(val == val_a);
@@ -109,8 +122,8 @@ void ref_test(T val_a, T val_b) {
 }
 
 TEST_CASE("integer") {
-    ref_test<int>(-34, 56);
-    ref_test<unsigned int>(43, 336);
+    ref_test(-34, 56);
+    ref_test(43u, 336u);
 
     using ref_type = confy::integer_ref<int>;
 
@@ -127,4 +140,8 @@ TEST_CASE("integer") {
         ref.set_value(34);
         CHECK_NOTHROW(ref.validate());
     }
+}
+
+TEST_CASE("std::string") {
+    ref_test<std::string>("hello", "world");
 }

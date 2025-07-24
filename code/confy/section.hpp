@@ -10,7 +10,7 @@
 
 namespace confy {
 
-class CONFY_API section final : public node {
+class CONFY_API section : public node {
 public:
     using node::node;
     ~section();
@@ -19,15 +19,15 @@ public:
         using node::tdsl<section>::tdsl;
     };
 
-    virtual dict to_dict() const noexcept override;
+    virtual dict to_dict() const noexcept final override;
 
-    virtual node* get_child(std::string_view path) const noexcept override;
-    virtual node* get_abbr_child(std::string_view path) const noexcept override;
+    virtual node* get_child(std::string_view path) const noexcept final override;
+    virtual node* get_abbr_child(std::string_view path) const noexcept final override;
 
-    virtual void set_from_dict(const dict& d, value_source src) override;
+    virtual void set_from_dict(const dict& d, value_source src) final override;
 
-    virtual void try_set_from_env_var() override;
-    virtual void validate() const override;
+    virtual void try_set_from_env_var() final override;
+    virtual void validate() const final override;
 
     section& add_section(node_desc desc) {
         auto sec = std::make_unique<section>(std::move(desc), this);
@@ -53,8 +53,8 @@ public:
     }
 
 private:
-    virtual std::string to_string() const noexcept override;
-    virtual void set_from_string(std::string_view str, value_source src) override;
+    virtual std::string to_string() const noexcept final override;
+    virtual void set_from_string(std::string_view str, value_source src) final override;
 
     void try_add_child(std::unique_ptr<node> child);
 

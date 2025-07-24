@@ -3,12 +3,13 @@
 //
 #pragma once
 #include "common_ref_value.hpp"
+#include "simple_value.hpp"
 #include "../dict.hpp"
 #include "../bits/throw_ex.hpp"
 
 namespace confy {
 
-class std_string final : public common_ref_value<std::string> {
+class std_string_ref final : public common_ref_value<std::string> {
 public:
     using common_ref_value<std::string>::common_ref_value;
 
@@ -17,7 +18,7 @@ public:
     }
 
     dict to_dict() const noexcept override {
-        return {m_ref};
+        return m_ref;
     }
 
     virtual void set_value_from_string(std::string_view str) override {
@@ -31,7 +32,9 @@ public:
 
 template <>
 struct ref_value_for<std::string> {
-    using type = std_string;
+    using type = std_string_ref;
 };
+
+using std_string = simple_value<std::string>;
 
 }

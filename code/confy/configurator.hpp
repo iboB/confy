@@ -6,7 +6,6 @@
 #include "cli.hpp"
 #include "dict.hpp"
 #include "section.hpp"
-#include <functional>
 #include <string>
 #include <iosfwd>
 #include <string_view>
@@ -16,81 +15,35 @@ namespace confy {
 class config;
 class basic_value;
 
-class CONFY_API configurator {
+class CONFY_API configurator : private section {
 public:
-    configurator(std::string_view name = "configuration");
+    struct desc {
+        std::string name; // name of the config, used for logging/debugging
+        std::string cli_prefix; // prefix for command line options
+        env::var env_var_prefix; // prefix for environment variables
+    };
+
+    explicit configurator(desc d = {});
     ~configurator();
 
     configurator(const configurator&) = delete;
     configurator& operator=(const configurator&) = delete;
 
-    void set_env_var_prefix(std::string_view prefix) {
-        m_env_var_prefix = std::string(prefix);
-    }
-
-    using verbose_log_func = std::function<void(std::string msg)>;
-    void set_verbose_log_function(verbose_log_func func) {
-        m_verbose_log_func = std::move(func);
-    }
-
-    // only parse command line and don't touch config values
     void parse_command_line(int& argc, char* argv[]);
-
     void parse_ini_file(std::istream& in, std::string_view filename = {});
-
     void parse_json_file(std::istream& in, std::string_view filename = {});
 
-    void add_manual_overrides(dict overrides);
+    using section::add_section;
+    using section::add_value;
+    using section::get_child;
+    using section::get_abbr_child;
 
-    enum command_result {
-        continue_exec, // continue execution (e.g. normal operation)
-        suggested_exit, // suggest the program to exit without error (e.g. help, version)
-    };
-
-    // utility func
-    // parse command line, execute commands, and configure()
-    command_result configure(int& argc, char* argv[]);
-
-    // configure from existing store
-    void configure();
-
-    section& add_section(section::description desc);
-    section& get_default_section() const noexcept;
-    section* find_section(std::string_view name) const noexcept;
+    void set_values_from_env_vars();
 
     config get_config();
 
-    // this following functions is are public for mostly for testing and debugging purposes
-    // there is no point in calling them manually
-
-    // resolve env var names in values
-    void _resolve_env_var_names();
-
-    struct cli_arg : public cli::parsed_argument {
-        bool used = false;
-    };
-    cli_arg* _find_cli_arg_for_value(basic_value& val);
-
 private:
-    std::string m_name; // name of config (for logging/debugging only)
-
-    verbose_log_func m_verbose_log_func; // function to log verbose messages
-
-    std::string m_cli_prefix; // prefix for command line options
-
-    std::string m_env_var_prefix; // prefix for environment variables
-    bool m_no_env = false; // disable environment variables
-
-    // value store
-    std::vector<cli_arg> m_cli_values;
-
-    dict m_config_file_values;
-    dict m_manual_overrides;
-
-    bool m_configure_done = false;
-
-    // configuration
-    std::vector<std::unique_ptr<section>> m_sections; // sections in this config, first section is default
+    desc m_desc;
 };
 
 } // namespace confy
