@@ -177,18 +177,18 @@ void configurator::configure() {
             }
 
             // look in the environment variables
-            if (!value->m_env_var.empty()) {
-                auto env_value = std::getenv(value->m_env_var.c_str());
+            if (!value->m_env_var.str.empty()) {
+                auto env_value = std::getenv(value->m_env_var.str.c_str());
                 if (env_value) {
                     VERBOSE(*value << ": setting from environment variable: "
-                        << value->m_env_var << " = " << env_value);
+                        << value->m_env_var.str << " = " << env_value);
                     value->set_from_string(env_value);
                     value->m_source = value_source::env_var;
                     value->validate();
                     continue;
                 }
                 else {
-                    VERBOSE("Env var " << value->m_env_var << " for " << *value << " is not set")
+                    VERBOSE("Env var " << value->m_env_var.str << " for " << *value << " is not set")
                 }
             }
 
@@ -280,43 +280,43 @@ void configurator::_resolve_env_var_names() {
     for (auto& sec : m_sections) {
         for (auto& value : sec->m_values) {
             if (m_no_env
-                || sec->desc().env_var_strat != env_var_strategy::none
-                || value->m_env_var_strategy != env_var_strategy::none
+                || sec->desc().env_var.strategy != env::var_strategy::none
+                || value->m_env_var.strategy != env::var_strategy::none
             ) {
                 // env vars are blocked
-                value->m_env_var.clear();
+                value->m_env_var.str.clear();
                 continue;
             }
 
-            if (value->m_env_var_strategy == env_var_strategy::manual_global) {
+            if (value->m_env_var.strategy == env::var_strategy::manual_global) {
                 // keep original
                 continue;
             }
 
             std::string env_var_name;
-            if (sec->desc().env_var_strat == env_var_strategy::manual_global) {
-                env_var_name = sec->desc().env_var_prefix;
+            if (sec->desc().env_var.strategy == env::var_strategy::manual_global) {
+                env_var_name = sec->desc().env_var.str;
             }
             else {
                 env_var_name = m_env_var_prefix;
-                if (sec->desc().env_var_strat != env_var_strategy::manual) {
-                    env_var_name += sec->desc().env_var_prefix;
+                if (sec->desc().env_var.strategy != env::var_strategy::manual) {
+                    env_var_name += sec->desc().env_var.str;
                 }
                 else {
-                    assert(sec->desc().env_var_strat == env_var_strategy::automatic);
+                    assert(sec->desc().env_var.strategy == env::var_strategy::automatic);
                     env_var_name += sec->desc().name + '_';
                 }
             }
 
-            if (value->m_env_var_strategy != env_var_strategy::manual) {
-                env_var_name += value->m_env_var;
+            if (value->m_env_var.strategy != env::var_strategy::manual) {
+                env_var_name += value->m_env_var.str;
             }
             else {
-                assert(value->m_env_var_strategy == env_var_strategy::automatic);
+                assert(value->m_env_var.strategy == env::var_strategy::automatic);
                 env_var_name += value->name();
             }
 
-            value->m_env_var = std::move(env_var_name);
+            value->m_env_var.str = std::move(env_var_name);
         }
     }
 }
