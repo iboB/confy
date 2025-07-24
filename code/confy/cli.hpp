@@ -9,8 +9,6 @@
 
 namespace confy::cli {
 
-inline constexpr char KEY_DELIM = '.';
-
 struct parsed_argument {
     std::string_view key;
     std::string_view value;

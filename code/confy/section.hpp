@@ -18,7 +18,16 @@ public:
     section(section&&) noexcept = default;
     section& operator=(section&&) noexcept = default;
 
-    //void add_value(std::unique_ptr<basic_value> value);
+    virtual std::string to_string() const noexcept override;
+    virtual dict to_dict() const noexcept override;
+
+    virtual node* get_child(std::string_view path) const noexcept override;
+    virtual node* get_abbr_child(std::string_view path) const noexcept override;
+
+    virtual void set_from_string(std::string_view str, value_source src) override;
+    virtual void set_from_dict(const dict& d, value_source src) override;
+
+    virtual void validate() const override;
 
 private:
     itlib::flat_map<std::string, std::unique_ptr<node>> m_children;
