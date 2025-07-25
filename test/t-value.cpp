@@ -39,7 +39,7 @@ struct test_value final : public confy::value {
     }
     virtual void validate_value() const override {
         if (str == "bad") {
-            throw confy::exception("bad");
+            throw confy::exception("no bad");
         }
     }
 };
@@ -100,7 +100,7 @@ TEST_CASE("str") {
     CHECK(val.source() == confy::value_source::cmd_line);
 }
 
-TEST_CASE("str") {
+TEST_CASE("dict") {
     using dict = confy::dict;
     test_value val;
     val.set_from_dict(dict("xxx"), confy::value_source::config_file);
@@ -108,11 +108,15 @@ TEST_CASE("str") {
     val.set_from_dict(dict("yyy"), confy::value_source::default_val);
     CHECK(val.str == "xxx");
     CHECK(val.source() == confy::value_source::config_file);
-    CHECK(val.to_string() == "xxx");
+    auto d = val.to_dict();
+    CHECK(d.is_string());
+    CHECK(d.get<std::string_view>() == "xxx");
     val.set_from_dict(dict("zzz"), confy::value_source::cmd_line);
     CHECK(val.str == "zzz");
     CHECK(val.source() == confy::value_source::cmd_line);
-    CHECK(val.to_string() == "zzz");
+    d = val.to_dict();
+    CHECK(d.is_string());
+    CHECK(d.get<std::string_view>() == "zzz");
     val.set_from_dict(dict("www"), confy::value_source::cmd_line);
     CHECK(val.str == "www");
 
@@ -164,5 +168,5 @@ TEST_CASE("validate") {
     CHECK_NOTHROW(val.validate());
 
     val.set_from_string("bad", confy::value_source::manual_override);
-    CHECK_THROWS_WITH(val.validate(), "test_value: bad");
+    CHECK_THROWS_WITH(val.validate(), "test_value: value 'bad' failed validation: no bad");
 }

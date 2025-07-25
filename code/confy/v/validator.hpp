@@ -4,6 +4,7 @@
 #pragma once
 #include <string>
 #include <functional>
+#include "../exception.hpp"
 
 namespace confy {
 
@@ -17,7 +18,7 @@ struct validator {
 template <typename T>
 class func_validator final : public validator<T> {
 public:
-    using func_type = std::function<void(const T&)>;
+    using func_type = std::function<bool(const T&)>;
 
     explicit func_validator(func_type func, std::string desc = {})
         : m_func(std::move(func))
@@ -25,7 +26,8 @@ public:
     {}
 
     void validate(const T& value) const override {
-        m_func(value);
+        if (m_func(value)) return;
+        throw exception(m_desc);
     }
 
     std::string get_desc() const noexcept override {

@@ -4,6 +4,7 @@
 #include "value.hpp"
 #include "bits/throw_ex.hpp"
 #include <cstdlib>
+#include <cstring>
 
 namespace confy {
 
@@ -42,7 +43,13 @@ void value::validate() const {
         validate_value();
     }
     catch (std::exception& ex) {
-        rethrow(ex.what());
+        std::ostringstream ss;
+        ss << "value '" << to_string() << "' failed validation";
+        auto desc = ex.what();
+        if (std::strlen(desc) > 0) {
+            ss << ": " << desc;
+        }
+        rethrow(ss.str().c_str());
     }
 }
 
