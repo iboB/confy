@@ -100,6 +100,16 @@ void section::try_add_child(std::unique_ptr<node> child) {
     if (m_children.count(name)) {
         throw_ex{} << get_path() << ": child with name '" << name << "' already exists";
     }
+    // search for a child with the same abbreviation
+    if (auto abbr = child->abbr(); !abbr.empty()) {
+        auto it = itlib::pfind_if(m_children.container(), [&](const auto& pair) {
+            return pair.second->abbr() == abbr;
+        });
+        if (it) {
+            throw_ex{} << get_path() << ": child with abbreviation '" << abbr << "' already exists";
+        }
+    }
+
     m_children[name] = std::move(child);
 }
 

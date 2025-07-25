@@ -88,8 +88,12 @@ TEST_CASE("no dup") {
     auto& ssa = sec.add_section({.name = "ssa", .abbr = "a"});
     ssa.add_section({.name = "xxx", .abbr = "x"});
 
-    CHECK_THROWS_WITH(sec.add_section({.name = "ssa"}), "test: child with name 'ssa' already exists");
-    CHECK_THROWS_WITH(ssa.add_section({.name = "xxx"}), "test.ssa: child with name 'xxx' already exists");
+    CHECK_THROWS_WITH(sec.add_section({.name = "ssa"}),
+        "test: child with name 'ssa' already exists");
+    CHECK_THROWS_WITH(ssa.add_section({.name = "xxx"}),
+        "test.ssa: child with name 'xxx' already exists");
+    CHECK_THROWS_WITH(ssa.add_section({.name = "zzz", .abbr = "x"}),
+        "test.ssa: child with abbreviation 'x' already exists");
 }
 
 TEST_CASE("noops") {
