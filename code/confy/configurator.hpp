@@ -14,7 +14,7 @@ namespace confy {
 class config;
 class basic_value;
 
-class CONFY_API configurator : private section {
+class CONFY_API configurator : public section {
 public:
     struct desc {
         std::string name; // name of the config, used for logging/debugging

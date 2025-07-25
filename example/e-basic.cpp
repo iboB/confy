@@ -4,6 +4,7 @@
 #include <confy/configurator.hpp>
 #include <confy/v/integer.hpp>
 #include <confy/v/std_string.hpp>
+#include <confy/audit_log.hpp>
 
 #include <iostream>
 #include <string>
@@ -31,11 +32,13 @@ int main(int argc, char* argv[]) try {
         return 0;
     }
 
-    std::cout
-        << "Name: " << c.name
-        << "\nAge: " << c.age
-        //<< "\nRole: " << confy::magic_enum::enum_name(c.role)
-        << "\n";
+    confy::audit_log(cfg, std::cout);
+
+    //std::cout
+    //    << "Name: " << c.name
+    //    << "\nAge: " << c.age
+    //    //<< "\nRole: " << confy::magic_enum::enum_name(c.role)
+    //    << "\n";
 
     return 0;
 }
