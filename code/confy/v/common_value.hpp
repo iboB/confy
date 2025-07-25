@@ -25,8 +25,8 @@ public:
     {}
 
     // this constructor is used for testing
-    explicit common_value(T ref) noexcept
-        : common_value(ref, {}, nullptr)
+    explicit common_value(T val) noexcept
+        : common_value(val, {}, nullptr)
     {}
 
     common_value(node_desc desc, node* owner) noexcept
