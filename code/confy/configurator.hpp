@@ -18,7 +18,6 @@ class CONFY_API configurator : private section {
 public:
     struct desc {
         std::string name; // name of the config, used for logging/debugging
-        std::string cli_prefix; // prefix for command line options
         env::var env_var_prefix; // prefix for environment variables
     };
 
@@ -34,7 +33,14 @@ public:
     using section::get_abbr_child;
 
     void set_values(const dict& d, value_source src = value_source::manual_override);
-    void parse_cmd_line(int& argc, char* argv[]);
+
+    struct cmd_line_options {
+        std::string_view cli_prefix; // prefix for command line options
+        int offset = 1; // offset in argc/argv for the command line arguments
+        bool allow_unparsed = false; // whether to throw on unparsed arguments
+    };
+    void parse_cmd_line(int& argc, char* argv[], cmd_line_options opts = {});
+
     void parse_ini_file(std::istream& in, std::string_view filename = {});
     void parse_json_file(std::istream& in, std::string_view filename = {});
     void set_values_from_env_vars();

@@ -25,8 +25,8 @@ void configurator::set_values(const dict& d, value_source src) {
     set_from_dict(d, src);
 }
 
-void configurator::parse_cmd_line(int& argc, char* argv[]) {
-    for (auto& arg : cli::filter_cmd_line(argc, argv, m_desc.cli_prefix)) {
+void configurator::parse_cmd_line(int& argc, char* argv[], cmd_line_options opts) {
+    for (auto& arg : cli::filter_cmd_line(argc, argv, opts.cli_prefix, opts.offset)) {
         node* child;
         if (arg.abbr) {
             child = get_abbr_child(arg.key);
@@ -42,6 +42,10 @@ void configurator::parse_cmd_line(int& argc, char* argv[]) {
         }
 
         child->set_from_string(arg.value, value_source::cmd_line);
+    }
+
+    if (!opts.allow_unparsed && argc > opts.offset) {
+        throw_ex{} << m_desc.name << ": unknown command line argument: " << argv[opts.offset];
     }
 }
 
