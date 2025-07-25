@@ -3,15 +3,15 @@
 //
 #pragma once
 #include "common_value.hpp"
-#include "../ref_value_for.hpp"
 
 namespace confy {
 
 template <>
 struct common_value_type_traits<std::string> {
-    using value_type = std::string;
     using ref_type = std::string&;
     using const_ref_type = const std::string&;
+    using validate_type = std::string;
+    static inline constexpr bool deref = false;
 
     static const std::string& to_string(const std::string& val) noexcept {
         return val;
@@ -31,10 +31,5 @@ struct common_value_type_traits<std::string> {
 };
 
 using std_string = common_value<std::string>;
-
-template <>
-struct ref_value_for<std::string> {
-    using type = common_value<std::string&>;
-};
 
 }

@@ -5,6 +5,7 @@
 #include "../value.hpp"
 #include "validator.hpp"
 #include "common_value_type_traits.hpp"
+#include "../ref_value_for.hpp"
 #include "../dict.hpp"
 #include <memory>
 #include <vector>
@@ -15,9 +16,9 @@ template <typename T>
 class common_value : public value {
 public:
     using traits = common_value_type_traits<T>;
-    using value_type = typename traits::value_type;
     using ref_type = typename traits::ref_type;
     using const_ref_type = typename traits::const_ref_type;
+    using validate_type = typename traits::validate_type;
 
     common_value(T val, node_desc desc, node* owner) noexcept
         : value(std::move(desc), owner)
@@ -59,13 +60,13 @@ public:
 
         template <template <typename> class Validator, typename... Args>
         dsl& validate(Args&&... args) {
-            auto validator = std::make_unique<Validator<value_type>>(std::forward<Args>(args)...);
+            auto validator = std::make_unique<Validator<validate_type>>(std::forward<Args>(args)...);
             this->m_node.m_validators.push_back(std::move(validator));
             return *this;
         }
 
-        dsl& validate(typename func_validator<value_type>::func_type func, std::string desc = {}) {
-            auto validator = std::make_unique<func_validator<value_type>>(std::move(func), std::move(desc));
+        dsl& validate(typename func_validator<validate_type>::func_type func, std::string desc = {}) {
+            auto validator = std::make_unique<func_validator<validate_type>>(std::move(func), std::move(desc));
             this->m_node.m_validators.push_back(std::move(validator));
             return *this;
         }
@@ -87,15 +88,25 @@ public:
         traits::set_value_from_dict(m_val, d);
     }
 
-protected:
     void validate_value() const override {
         for (auto& v : m_validators) {
-            v->validate(m_val);
+            if constexpr (traits::deref) {
+                v->validate(*m_val);
+            }
+            else {
+                v->validate(m_val);
+            }
         }
     }
 
+protected:
     T m_val;
-    std::vector<std::unique_ptr<validator<value_type>>> m_validators;
+    std::vector<std::unique_ptr<validator<validate_type>>> m_validators;
+};
+
+template <typename T>
+struct ref_value_for {
+    using type = common_value<T&>;
 };
 
 } // namespace confy

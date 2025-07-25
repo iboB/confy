@@ -3,7 +3,6 @@
 //
 #pragma once
 #include "common_value.hpp"
-#include "../ref_value_for.hpp"
 #include "../bits/throw_ex.hpp"
 #include <concepts>
 #include <charconv>
@@ -12,9 +11,10 @@ namespace confy {
 
 template <typename T>
 struct common_value_type_traits<std::optional<T>> {
-    using value_type = std::optional<T>;
     using ref_type = std::optional<T>&;
     using const_ref_type = const std::optional<T>&;
+    using validate_type = T;
+    static inline constexpr bool deref = true;
 
     using value_traits = common_value_type_traits<T>;
 
@@ -55,12 +55,26 @@ struct common_value_type_traits<std::optional<T>> {
     }
 };
 
+template <typename Opt>
+class std_optional_value : public common_value<Opt> {
+public:
+    using super = common_value<Opt>;
+    using super::common_value;
+
+    void validate_value() const override {
+        if (!this->m_val) return; // nothing to validate if not set
+        for (auto& v : this->m_validators) {
+            v->validate(*this->m_val);
+        }
+    }
+};
+
 template <typename T>
-using std_optional = common_value<std::optional<T>>;
+using std_optional = std_optional_value<std::optional<T>>;
 
 template <typename T>
 struct ref_value_for<std::optional<T>> {
-    using type = common_value<std::optional<T>&>;
+    using type = std_optional_value<std::optional<T>&>;
 };
 
 } // namespace confy

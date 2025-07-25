@@ -3,16 +3,16 @@
 //
 #pragma once
 #include "common_value.hpp"
-#include "../ref_value_for.hpp"
 #include "../bits/throw_ex.hpp"
 
 namespace confy {
 
 template <>
 struct common_value_type_traits<bool> {
-    using value_type = bool;
     using ref_type = bool&;
     using const_ref_type = const bool&;
+    using validate_type = bool;
+    static inline constexpr bool deref = false;
 
     static std::string to_string(bool val) noexcept {
         return val ? "true" : "false";
@@ -40,10 +40,5 @@ struct common_value_type_traits<bool> {
 };
 
 using boolean = common_value<bool>;
-
-template <>
-struct ref_value_for<bool> {
-    using type = common_value<bool&>;
-};
 
 }

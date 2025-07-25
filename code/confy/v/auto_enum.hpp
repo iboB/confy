@@ -3,7 +3,6 @@
 //
 #pragma once
 #include "common_value.hpp"
-#include "../ref_value_for.hpp"
 #include "../bits/throw_ex.hpp"
 #include <concepts>
 
@@ -20,9 +19,10 @@ concept enumeration = std::is_enum_v<T>;
 
 template <enumeration E>
 struct common_value_type_traits<E> {
-    using value_type = E;
     using ref_type = E&;
     using const_ref_type = const E&;
+    using validate_type = E;
+    static inline constexpr bool deref = false;
 
     static std::string to_string(const E& val) noexcept {
         return std::string(magic_enum::enum_name(val));
