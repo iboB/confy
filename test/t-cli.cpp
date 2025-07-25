@@ -73,7 +73,7 @@ struct arg_result {
     std::vector<std::string> rem;
 };
 
-arg_result test_filter_cmd_line(std::vector<std::string> sargv, std::string_view prefix = {}) {
+arg_result test_filter_cmd_line(std::vector<std::string> sargv, std::string_view prefix = {}, int offset = 0) {
     arg_result ret;
 
     std::vector<char*> argv;
@@ -84,7 +84,7 @@ arg_result test_filter_cmd_line(std::vector<std::string> sargv, std::string_view
     }
     int argc = int(argv.size());
 
-    auto gen = filter_cmd_line(argc, argv.data(), prefix);
+    auto gen = filter_cmd_line(argc, argv.data(), prefix, offset + 1);
     for (auto& p : gen) {
         ret.parsed.push_back({std::string(p.key), std::string(p.value), p.abbr});
     }
@@ -135,5 +135,16 @@ TEST_CASE("filter_cmd_line") {
         "my:"
     );
     CHECK(r.rem == v{"-x", "--y", "-zz=34", "--yours:gg=45"});
+    check_parsed();
+
+    r = test_filter_cmd_line(
+        {
+            "-my:x", "--my:y", "--my:foo=5",
+            "--my:allow=false", "--my:chordata.lion", "pepe", "-zz=34", "-my:b=0", "--yours:gg=45", "-my:chordata.l", "pipi"
+        },
+        "my:",
+        3
+    );
+    CHECK(r.rem == v{"-my:x", "--my:y", "--my:foo=5", "-zz=34", "--yours:gg=45"});
     check_parsed();
 }

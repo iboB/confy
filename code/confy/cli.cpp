@@ -43,11 +43,11 @@ std::optional<parsed_argument> parse_arg(std::string_view arg, std::string_view 
     return ret;
 }
 
-itlib::generator<parsed_argument> filter_cmd_line(int& argc, char* argv[], std::string_view prefix) noexcept {
+itlib::generator<parsed_argument> filter_cmd_line(int& argc, char* argv[], std::string_view prefix, int offset) noexcept {
     parsed_argument last_p;
     bool wants_value = false;
-    int new_argc = 1; // argc after parsing
-    for (int i = 1; i < argc; ++i) {
+    int new_argc = offset; // argc after parsing
+    for (int i = offset; i < argc; ++i) {
         std::string_view arg = argv[i];
         auto p = parse_arg(arg, prefix);
 

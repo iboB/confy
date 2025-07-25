@@ -19,6 +19,6 @@ CONFY_API std::optional<parsed_argument> parse_arg(std::string_view arg, std::st
 
 // yield relevant args and filter command line so that only irrelevant args remain
 // relevant args are those that start with one or two dashes and prefix
-CONFY_API itlib::generator<parsed_argument> filter_cmd_line(int& argc, char* argv[], std::string_view prefix = {}) noexcept;
+CONFY_API itlib::generator<parsed_argument> filter_cmd_line(int& argc, char* argv[], std::string_view prefix = {}, int offset = 1) noexcept;
 
 } // namespace confy::cli
