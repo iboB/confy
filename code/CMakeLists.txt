@@ -27,6 +27,7 @@ target_sources(confy
         confy/node.hpp
         confy/section.hpp
         confy/value.hpp
+        confy/node_visitor.hpp
 
         confy/cli.hpp
         confy/configurator.hpp
@@ -38,6 +39,7 @@ target_sources(confy
         confy/node.cpp
         confy/section.cpp
         confy/value.cpp
+        confy/node_visitor.cpp
 
         confy/cli.cpp
         confy/configurator.cpp

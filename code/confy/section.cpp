@@ -4,6 +4,7 @@
 #include "section.hpp"
 #include "dict.hpp"
 #include "path_delim.hpp"
+#include "node_visitor.hpp"
 #include "bits/throw_ex.hpp"
 
 namespace confy {
@@ -90,6 +91,10 @@ void section::validate() const {
     for (const auto& c : m_children) {
         c->validate();
     }
+}
+
+void section::visit(node_visitor& v) const {
+    v.on(*this);
 }
 
 void section::try_add_child(std::unique_ptr<node> child) {

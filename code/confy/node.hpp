@@ -12,6 +12,8 @@
 
 namespace confy {
 
+class node_visitor;
+
 class CONFY_API node {
 public:
     explicit node(node_desc desc, node* owner) noexcept
@@ -50,6 +52,8 @@ public:
 
     // throw an exception if the node is not valid
     virtual void validate() const = 0;
+
+    virtual void visit(node_visitor& v) const = 0;
 
     template <typename Node>
     class tdsl {

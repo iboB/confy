@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "value.hpp"
+#include "node_visitor.hpp"
 #include "bits/throw_ex.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -51,6 +52,10 @@ void value::validate() const {
         }
         rethrow(ss.str().c_str());
     }
+}
+
+void value::visit(node_visitor& v) const {
+    v.on(*this);
 }
 
 void value::try_set_from_env_var() {

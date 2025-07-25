@@ -29,6 +29,8 @@ public:
     virtual void try_set_from_env_var() final override;
     virtual void validate() const final override;
 
+    virtual void visit(node_visitor& v) const final override;
+
     section& add_section(node_desc desc) {
         auto sec = std::make_unique<section>(std::move(desc), this);
         auto ret = sec.get();

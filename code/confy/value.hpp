@@ -7,6 +7,8 @@
 
 namespace confy {
 
+class node_visitor;
+
 class CONFY_API value : public node {
 public:
     using node::node;
@@ -41,6 +43,8 @@ public:
     virtual void try_set_from_env_var() final override;
 
     virtual void validate() const final override;
+
+    virtual void visit(node_visitor& v) const final override;
 
 protected:
     virtual void set_value_from_dict(const dict& d) = 0;
