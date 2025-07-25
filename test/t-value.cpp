@@ -53,7 +53,7 @@ TEST_CASE("basics") {
     CHECK(val.env_var_data().strategy == confy::env::var_strategy::automatic);
 
     CHECK(val.required());
-    CHECK(val.source() == confy::value_source::none);
+    CHECK(val.source() == confy::value_source::default_val);
 }
 
 TEST_CASE("dsl") {
@@ -131,7 +131,7 @@ TEST_CASE("env var") {
     using dict = confy::dict;
     test_value val({.name = "CONFY_TEST_VALUE"}, nullptr);
     val.try_set_from_env_var();
-    CHECK(val.source() == confy::value_source::none);
+    CHECK(val.source() == confy::value_source::default_val);
 
     set_env_var("CONFY_TEST_VALUE", "nope");
     CHECK_THROWS_WITH(val.try_set_from_env_var(),
@@ -158,10 +158,13 @@ TEST_CASE("env var") {
 TEST_CASE("validate") {
     test_value val;
 
-    CHECK_THROWS_WITH(val.validate(), "test_value: value is required but not set");
+    CHECK(val.source() == confy::value_source::default_val);
+    CHECK_NOTHROW(val.validate());
     test_value::dsl(val).optional();
+    CHECK(val.source() == confy::value_source::none);
     CHECK_NOTHROW(val.validate());
     test_value::dsl(val).required();
+    CHECK(val.source() == confy::value_source::none);
     CHECK_THROWS_WITH(val.validate(), "test_value: value is required but not set");
 
     val.set_from_string("good", confy::value_source::manual_override);

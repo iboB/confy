@@ -31,6 +31,7 @@ public:
 
     common_value(node_desc desc, node* owner) noexcept
         : value(std::move(desc), owner)
+        , m_val()
     {}
 
     common_value() noexcept

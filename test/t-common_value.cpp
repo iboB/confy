@@ -41,7 +41,7 @@ TEST_CASE("basics") {
     CHECK(val.env_var_data().str.empty());
     CHECK(val.env_var_data().strategy == confy::env::var_strategy::automatic);
     CHECK(val.required());
-    CHECK(val.source() == confy::value_source::none);
+    CHECK(val.source() == confy::value_source::default_val);
 
     val.set_value("aaa", confy::value_source::cmd_line);
     CHECK(val.val() == "aaa");
@@ -72,7 +72,7 @@ TEST_CASE("dsl") {
     CHECK(val.abbr() == "t");
     CHECK(val.env_var_data().str == "TEST");
     CHECK(val.env_var_data().strategy == confy::env::var_strategy::manual);
-    CHECK(val.source() == confy::value_source::default_val);
+    CHECK(val.source() == confy::value_source::none);
     CHECK(val.val() == "ddd");
     CHECK_FALSE(val.required());
 }

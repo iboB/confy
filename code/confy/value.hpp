@@ -24,11 +24,13 @@ public:
 
         NodeDsl& optional() {
             this->m_node.m_required = false;
+            this->m_node.m_source = value_source::none;
             return this->self();
         }
 
         NodeDsl& required() {
             this->m_node.m_required = true;
+            this->m_node.m_source = value_source::none;
             return this->self();
         }
     };
@@ -52,7 +54,7 @@ protected:
     virtual void validate_value() const = 0;
 
     bool m_required = true; // whether this value is required or optional
-    value_source m_source = value_source::none; // source from which the value was set
+    value_source m_source = value_source::default_val; // source from which the value was set
 
 private:
     [[noreturn]] void rethrow(const char* ex) const;
