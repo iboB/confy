@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <confy/v/integer.hpp>
+#include <confy/v/boolean.hpp>
 #include <confy/v/std_string.hpp>
 #include <doctest/doctest.h>
 #include <confy/dict.hpp>
@@ -49,4 +50,38 @@ TEST_CASE("std::string") {
 
     CHECK_THROWS_WITH(str_t::set_value_from_dict(val, confy::dict(1.5)),
         "[json.exception.type_error.302] type must be string, but is number");
+}
+
+TEST_CASE("bool") {
+    auto bool_t = confy::common_value_type_traits<bool>();
+
+    CHECK(bool_t.to_string(true) == "true");
+    CHECK(bool_t.to_string(false) == "false");
+    auto d_true = bool_t.to_dict(true);
+    CHECK(d_true.is_boolean());
+    CHECK(d_true.get<bool>() == true);
+    auto d_false = bool_t.to_dict(false);
+    CHECK(d_false.is_boolean());
+    CHECK(d_false.get<bool>() == false);
+
+    bool val = false;
+    bool_t.set_value_from_string(val, "true");
+    CHECK(val == true);
+    bool_t.set_value_from_string(val, "false");
+    CHECK(val == false);
+    bool_t.set_value_from_string(val, "1");
+    CHECK(val == true);
+    bool_t.set_value_from_string(val, "0");
+    CHECK(val == false);
+
+    bool_t.set_value_from_dict(val, d_true);
+    CHECK(val == true);
+    bool_t.set_value_from_dict(val, d_false);
+    CHECK(val == false);
+
+    CHECK_THROWS_WITH(bool_t.set_value_from_string(val, "not a bool"),
+        "failed to parse boolean from 'not a bool'");
+
+    CHECK_THROWS_WITH(bool_t.set_value_from_dict(val, confy::dict(1.5)),
+        "[json.exception.type_error.302] type must be boolean, but is number");
 }
