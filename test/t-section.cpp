@@ -237,3 +237,18 @@ TEST_CASE("get_env_var_name") {
         CHECK(cc.get_env_var_name() == "");
     }
 }
+
+TEST_CASE("get_env_var_name edge") {
+    {
+        confy::section aa({}, nullptr);
+        auto& bb = aa.add_section({.name = "bb"});
+        auto& cc = bb.add_section({.name = "cc"});
+        CHECK(cc.get_env_var_name() == "bb_cc");
+    }
+    {
+        confy::section aa({.name = "aa"}, nullptr);
+        auto& bb = aa.add_section({});
+        auto& cc = bb.add_section({.name = "cc"});
+        CHECK(cc.get_env_var_name() == "aa_cc");
+    }
+}

@@ -71,6 +71,6 @@ In order to buld the tests, you have to fetch the [doctest](https://github.com/o
 
 The library is distributed under the MIT Software License. See LICENSE.txt for further details or copy [here](http://opensource.org/licenses/MIT).
 
-Copyright &copy; 2020-2024 Borislav Stanimirov.
+Copyright &copy; 2020-2025 Borislav Stanimirov.
 
-confy embeds [Magic Enum](https://github.com/Neargye/magic_enum), &copy; 2019-2020 Daniil Goncharov, which also under the MIT Softwre License.
+confy embeds [Magic Enum](https://github.com/Neargye/magic_enum), &copy; 2019-2020 Daniil Goncharov, also under the MIT Softwre License.

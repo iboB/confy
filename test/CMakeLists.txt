@@ -17,6 +17,7 @@ confy_test(value)
 
 confy_test(common_value)
 confy_test(common_value_types)
+confy_test(auto_enum)
 confy_test(std_optional)
 
 confy_test(section)
