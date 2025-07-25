@@ -21,6 +21,10 @@ configurator::configurator(desc d)
 
 configurator::~configurator() = default;
 
+void configurator::set_values(const dict& d, value_source src) {
+    set_from_dict(d, src);
+}
+
 void configurator::parse_cmd_line(int& argc, char* argv[]) {
     for (auto& arg : cli::filter_cmd_line(argc, argv, m_desc.cli_prefix)) {
         node* child;
@@ -33,8 +37,8 @@ void configurator::parse_cmd_line(int& argc, char* argv[]) {
 
         if (!child) {
             // no such node, this is an error
-            throw_ex{} << m_desc.name << ": unknown command line argument: "
-                << arg.key << (arg.abbr ? " (abbr)" : "") << " = " << arg.value;
+            throw_ex{} << m_desc.name << ": unknown command line argument: " << arg.key;
+                // << (arg.abbr ? " (abbr)" : "") << " = " << arg.value;
         }
 
         child->set_from_string(arg.value, value_source::cmd_line);
@@ -72,6 +76,13 @@ void configurator::parse_json_file(std::istream& in, std::string_view filename) 
 
 void configurator::set_values_from_env_vars() {
     try_set_from_env_var();
+}
+
+configurator::command_result configurator::configure(int& argc, char* argv[]) {
+    parse_cmd_line(argc, argv);
+    set_values_from_env_vars();
+    validate();
+    return command_result::continue_exec;
 }
 
 } // namespace confy

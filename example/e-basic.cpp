@@ -27,7 +27,9 @@ int main(int argc, char* argv[]) try {
     cfg.add_value(c.age, {"age", "The age of the person", "a"});
     //cfg.add_value(c.role, "role", "r", "The role of the person");
 
-    cfg.parse_cmd_line(argc, argv);
+    if (cfg.configure(argc, argv) == confy::configurator::command_result::suggest_exit) {
+        return 0;
+    }
 
     std::cout
         << "Name: " << c.name
@@ -38,7 +40,7 @@ int main(int argc, char* argv[]) try {
     return 0;
 }
 catch (std::exception& e) {
-    std::cerr << "Exception: " << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
     return 1;
 }
 catch (...) {

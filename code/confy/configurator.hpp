@@ -28,16 +28,27 @@ public:
     configurator(const configurator&) = delete;
     configurator& operator=(const configurator&) = delete;
 
-    void parse_cmd_line(int& argc, char* argv[]);
-    void parse_ini_file(std::istream& in, std::string_view filename = {});
-    void parse_json_file(std::istream& in, std::string_view filename = {});
-
     using section::add_section;
     using section::add_value;
     using section::get_child;
     using section::get_abbr_child;
 
+    void set_values(const dict& d, value_source src = value_source::manual_override);
+    void parse_cmd_line(int& argc, char* argv[]);
+    void parse_ini_file(std::istream& in, std::string_view filename = {});
+    void parse_json_file(std::istream& in, std::string_view filename = {});
     void set_values_from_env_vars();
+    using section::validate;
+
+    enum command_result {
+        continue_exec, // continue execution (e.g. normal operation)
+        suggest_exit, // suggest the program to exit without error (e.g. help, version)
+    };
+
+    // parse command line arguments
+    // execute commands if any
+    // if comamnds don't suggest exit, set values from env vars and validate
+    command_result configure(int& argc, char* argv[]);
 
     config get_config();
 
