@@ -5,7 +5,6 @@
 #include "dict.hpp"
 #include "path_delim.hpp"
 #include "bits/throw_ex.hpp"
-#include <itlib/qalgorithm.hpp>
 
 namespace confy {
 
@@ -16,22 +15,21 @@ std::string section::to_string() const noexcept {
 }
 dict section::to_dict() const noexcept {
     auto d = dict::object();
-    for (const auto& [name, child] : m_children) {
-        d[name] = child->to_dict();
+    for (const auto& child : m_children) {
+        d[child->name()] = child->to_dict();
     }
     return d;
 }
 
 node* section::get_child(std::string_view path) const noexcept {
-    if (auto it = m_children.find(path); it != m_children.end()) {
-        // path point to a child directly
-        return it->second.get();
+    if (auto child = m_children.find_by_name(path)) {
+        // path points to a child directly
+        return child;
     }
 
     if (auto d = path.find(PATH_DELIM); d != std::string_view::npos) {
         auto child_name = path.substr(0, d);
-        if (auto it = m_children.find(child_name); it != m_children.end()) {
-            auto& child = it->second;
+        if (auto child = m_children.find_by_name(child_name)) {
             return child->get_child(path.substr(d + 1));
         }
         else {
@@ -43,20 +41,15 @@ node* section::get_child(std::string_view path) const noexcept {
 }
 
 node* section::get_abbr_child(std::string_view path) const noexcept {
-    auto p = itlib::pfind_if(m_children.container(), [&](const auto& pair) {
-        return pair.second->abbr() == path;
-    });
-    if (p) {
-        return p->second.get();
+    if (auto child = m_children.find_by_abbr(path)) {
+        // path points to a child directly
+        return child;
     }
 
     if (auto d = path.find(PATH_DELIM); d != std::string_view::npos) {
-        auto child_abbr = path.substr(0, d);
-        auto child = itlib::pfind_if(m_children.container(), [&](const auto& pair) {
-            return pair.second->abbr() == child_abbr;
-        });
-        if (child) {
-            return child->second->get_abbr_child(path.substr(d + 1));
+        auto child_name = path.substr(0, d);
+        if (auto child = m_children.find_by_abbr(child_name)) {
+            return child->get_abbr_child(path.substr(d + 1));
         }
         else {
             return nullptr; // no such child
@@ -72,9 +65,9 @@ void section::set_from_string(std::string_view, value_source) {
 
 void section::set_from_dict(const dict& d, value_source src) {
     for (const auto& [name, value] : d.items()) {
-        if (auto it = m_children.find(name); it != m_children.end()) {
+        if (auto child = m_children.find_by_name(name)) {
             // found a child with the same name
-            it->second->set_from_dict(value, src);
+            child->set_from_dict(value, src);
         }
         else {
             // create a new child section or value
@@ -85,32 +78,29 @@ void section::set_from_dict(const dict& d, value_source src) {
 
 void section::try_set_from_env_var() {
     for (const auto& c : m_children) {
-        c.second->try_set_from_env_var();
+        c->try_set_from_env_var();
     }
 }
 
 void section::validate() const {
     for (const auto& c : m_children) {
-        c.second->validate();
+        c->validate();
     }
 }
 
 void section::try_add_child(std::unique_ptr<node> child) {
     auto name = child->name();
-    if (m_children.count(name)) {
+    if (m_children.find_by_name(name)) {
         throw_ex{} << get_path() << ": child with name '" << name << "' already exists";
     }
     // search for a child with the same abbreviation
     if (auto abbr = child->abbr(); !abbr.empty()) {
-        auto it = itlib::pfind_if(m_children.container(), [&](const auto& pair) {
-            return pair.second->abbr() == abbr;
-        });
-        if (it) {
+        if (m_children.find_by_abbr(abbr)) {
             throw_ex{} << get_path() << ": child with abbreviation '" << abbr << "' already exists";
         }
     }
 
-    m_children[name] = std::move(child);
+    m_children.push_back(std::move(child));
 }
 
 } // namespace confy

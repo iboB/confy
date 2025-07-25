@@ -5,8 +5,7 @@
 #include "api.h"
 #include "node.hpp"
 #include "ref_value_for.hpp"
-#include <memory>
-#include <itlib/flat_map.hpp>
+#include "node_container.hpp"
 
 namespace confy {
 
@@ -58,7 +57,7 @@ private:
 
     void try_add_child(std::unique_ptr<node> child);
 
-    itlib::flat_map<std::string, std::unique_ptr<node>> m_children;
+    node_container m_children;
 };
 
 } // namespace confy
