@@ -128,7 +128,6 @@ TEST_CASE("dict") {
 }
 
 TEST_CASE("env var") {
-    using dict = confy::dict;
     test_value val({.name = "CONFY_TEST_VALUE"}, nullptr);
     val.try_set_from_env_var();
     CHECK(val.source() == confy::value_source::default_val);

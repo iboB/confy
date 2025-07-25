@@ -30,6 +30,7 @@ public:
         m_out << "=" << val.to_string() << "\n";
         m_out << "  (source: ";
         switch (val.source()) {
+            case value_source::none: m_out << "???"; break; // here for the warning's sake
             case value_source::default_val: m_out << "default value"; break;
             case value_source::env_var: m_out << "environment variable"; break;
             case value_source::config_file: m_out << "config file"; break;

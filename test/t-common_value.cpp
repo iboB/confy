@@ -78,7 +78,6 @@ TEST_CASE("dsl") {
 }
 
 TEST_CASE("str") {
-    using dict = confy::dict;
     test_value val({.name = "test_value"}, nullptr);
     val.set_from_string("xxx", confy::value_source::config_file);
     CHECK(val.val() == "s-xxx");

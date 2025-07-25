@@ -14,6 +14,12 @@ namespace confy {
 class config;
 class basic_value;
 
+struct cmd_line_options {
+    std::string_view cli_prefix; // prefix for command line options
+    int offset = 1; // offset in argc/argv for the command line arguments
+    bool allow_unparsed = false; // whether to throw on unparsed arguments
+};
+
 class CONFY_API configurator : public section {
 public:
     struct desc {
@@ -34,11 +40,6 @@ public:
 
     void set_values(const dict& d, value_source src = value_source::manual_override);
 
-    struct cmd_line_options {
-        std::string_view cli_prefix; // prefix for command line options
-        int offset = 1; // offset in argc/argv for the command line arguments
-        bool allow_unparsed = false; // whether to throw on unparsed arguments
-    };
     void parse_cmd_line(int& argc, char* argv[], cmd_line_options opts = {});
 
     void parse_ini_file(std::istream& in, std::string_view filename = {});
