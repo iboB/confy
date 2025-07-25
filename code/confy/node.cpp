@@ -54,9 +54,11 @@ std::optional<std::string> construct_env_var_name(const node* n, bool leaf) {
     else {
         assert(ev.strategy == env::var_strategy::automatic);
 
-        ret += n->name();
-        if (!leaf) {
-            ret += '_';
+        if (!n->name().empty()) {
+            ret += n->name();
+            if (!leaf) {
+                ret += '_';
+            }
         }
         return ret;
     }

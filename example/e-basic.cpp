@@ -4,6 +4,7 @@
 #include <confy/configurator.hpp>
 #include <confy/v/integer.hpp>
 #include <confy/v/std_string.hpp>
+#include <confy/v/auto_enum.hpp>
 #include <confy/audit_log.hpp>
 
 #include <iostream>
@@ -26,7 +27,7 @@ int main(int argc, char* argv[]) try {
     //.cmd<confy::ini_file>()
     cfg.add_value(c.name, {"name", "The name of the person", "n"});
     cfg.add_value(c.age, {"age", "The age of the person", "a"});
-    //cfg.add_value(c.role, "role", "r", "The role of the person");
+    cfg.add_value(c.role, {"role", "The role of the person", "r"});
 
     if (cfg.configure(argc, argv) == confy::configurator::command_result::suggest_exit) {
         return 0;
