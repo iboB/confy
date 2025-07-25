@@ -40,6 +40,10 @@ node* section::get_child(std::string_view path) const noexcept {
     return nullptr; // no such child
 }
 
+std::span<const std::unique_ptr<node>> section::children() const noexcept {
+    return m_children;
+}
+
 node* section::get_abbr_child(std::string_view path) const noexcept {
     if (auto child = m_children.find_by_abbr(path)) {
         // path points to a child directly

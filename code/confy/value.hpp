@@ -59,6 +59,9 @@ private:
     virtual node* get_abbr_child(std::string_view) const noexcept final override {
         return nullptr;
     }
+    virtual std::span<const std::unique_ptr<node>> children() const noexcept final override {
+        return {};
+    }
 };
 
 } // namespace confy

@@ -22,6 +22,7 @@ public:
 
     virtual node* get_child(std::string_view path) const noexcept final override;
     virtual node* get_abbr_child(std::string_view path) const noexcept final override;
+    virtual std::span<const std::unique_ptr<node>> children() const noexcept final override;
 
     virtual void set_from_dict(const dict& d, value_source src) final override;
 

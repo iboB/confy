@@ -8,6 +8,7 @@
 #include "value_source.hpp"
 #include "env.hpp"
 #include <string_view>
+#include <span>
 
 namespace confy {
 
@@ -40,6 +41,7 @@ public:
 
     virtual node* get_child(std::string_view path) const noexcept = 0;
     virtual node* get_abbr_child(std::string_view path) const noexcept = 0;
+    virtual std::span<const std::unique_ptr<node>> children() const noexcept = 0;
 
     virtual void set_from_string(std::string_view str, value_source src) = 0;
     virtual void set_from_dict(const dict& d, value_source src) = 0;
