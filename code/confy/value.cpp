@@ -12,8 +12,8 @@ void value::set_from_string(std::string_view str, value_source src) {
     try {
         set_value_from_string(str);
     }
-    catch (confy::exception& ex) {
-        rethrow(ex);
+    catch (std::exception& ex) {
+        rethrow(ex.what());
     }
     m_source = src;
 }
@@ -23,8 +23,8 @@ void value::set_from_dict(const dict& d, value_source src) {
     try {
         set_value_from_dict(d);
     }
-    catch (confy::exception& ex) {
-        rethrow(ex);
+    catch (std::exception& ex) {
+        rethrow(ex.what());
     }
     m_source = src;
 }
@@ -41,8 +41,8 @@ void value::validate() const {
     try {
         validate_value();
     }
-    catch (confy::exception& ex) {
-        rethrow(ex);
+    catch (std::exception& ex) {
+        rethrow(ex.what());
     }
 }
 
@@ -57,14 +57,14 @@ void value::try_set_from_env_var() {
             m_source = value_source::env_var;
         }
         catch (confy::exception& e) {
-            throw_ex{} << get_path() << ": " << e.what() << " from env_var "
-                << env_var_name + " = " << env_value;
+            throw_ex{} << get_path() << ": " << e.what() << " from env var "
+                << env_var_name + "=" << env_value;
         }
     }
 }
 
-void value::rethrow(const confy::exception& ex) const {
-    throw_ex{} << get_path() << ": " << ex.what();
+void value::rethrow(const char* ex) const {
+    throw_ex{} << get_path() << ": " << ex;
 }
 
 } // namespace confy
