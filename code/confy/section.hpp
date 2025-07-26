@@ -54,6 +54,18 @@ public:
         return typename decltype(val)::element_type::dsl(*ret);
     }
 
+    struct struct_visitor {
+        section& sec;
+
+        template <typename Value>
+        typename Value::dsl visit(node_desc desc) {
+            return sec.add_value<Value>(std::move(desc));
+        }
+    };
+
+    template <typename T>
+    void add_struct() {}
+
 private:
     virtual std::string to_string() const noexcept final override;
     virtual void set_from_string(std::string_view str, value_source src) final override;
