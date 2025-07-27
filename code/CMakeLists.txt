@@ -19,6 +19,7 @@ target_link_libraries(confy PUBLIC
 target_sources(confy
     INTERFACE FILE_SET HEADERS FILES
         confy/api.h
+        confy/bits/cli_util.hpp
 
         confy/exception.hpp
 
@@ -29,9 +30,11 @@ target_sources(confy
         confy/value.hpp
         confy/node_visitor.hpp
 
-        confy/cli.hpp
+
         confy/configurator.hpp
     PRIVATE
+        confy/bits/cli_util.cpp
+
         confy/exception.cpp
 
         confy/config.cpp
@@ -41,6 +44,5 @@ target_sources(confy
         confy/value.cpp
         confy/node_visitor.cpp
 
-        confy/cli.cpp
         confy/configurator.cpp
 )

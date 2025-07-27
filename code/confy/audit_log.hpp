@@ -41,7 +41,7 @@ public:
     }
 };
 
-void audit_log(const section& sec, std::ostream& out) {
+inline void audit_log(const section& sec, std::ostream& out) {
     audit_log_visitor v{out};
     sec.visit(v);
 }

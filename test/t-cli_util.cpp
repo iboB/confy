@@ -1,7 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include <confy/cli.hpp>
+#include <confy/bits/cli_util.hpp>
 #include <doctest/doctest.h>
 #include <vector>
 

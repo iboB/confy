@@ -1,7 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include "cli.hpp"
+#include "cli_util.hpp"
 
 namespace confy::cli {
 

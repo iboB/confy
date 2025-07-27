@@ -3,7 +3,6 @@
 //
 #pragma once
 #include "api.h"
-#include "cli.hpp"
 #include "section.hpp"
 #include <string>
 #include <iosfwd>

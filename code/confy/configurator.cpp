@@ -4,6 +4,7 @@
 #include "configurator.hpp"
 #include "config.hpp"
 #include "bits/throw_ex.hpp"
+#include "bits/cli_util.hpp"
 #include <itlib/qalgorithm.hpp>
 #include <fstream>
 #include <sstream>
